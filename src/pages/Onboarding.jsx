@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { EQUIPMENT } from "../data/exercises";
 
 const LEVELS = ["Beginner", "Intermediate", "Advanced"];
@@ -27,7 +27,7 @@ export default function Onboarding({ onComplete, onCancel }) {
 
         {/* Logo */}
         <div className="mb-10 text-center">
-          <h1 className="font-display" style={{ color: "#CCFF47", fontSize: "14px", letterSpacing: "0.3em", lineHeight: "2" }}>
+          <h1 className="font-display" style={{ color: "var(--accent)", fontSize: "14px", letterSpacing: "0.3em", lineHeight: "2" }}>
             GYMBUDDY
           </h1>
           <p className="text-neutral-600 text-sm mt-1">
@@ -54,9 +54,9 @@ export default function Onboarding({ onComplete, onCancel }) {
               onClick={() => setStep(1)}
               disabled={!name.trim()}
               className="w-full py-4 font-semibold text-neutral-950 disabled:opacity-40 pixel-btn transition-all"
-              style={{ background: "#CCFF47" }}
+              style={{ background: "var(--accent)" }}
             >
-              Next →
+              Next â†’
             </button>
             {onCancel && (
               <button onClick={onCancel} className="w-full py-3 mt-2 text-sm text-neutral-600 hover:text-neutral-400 transition-colors">
@@ -88,10 +88,10 @@ export default function Onboarding({ onComplete, onCancel }) {
             </div>
             <div className="flex gap-3">
               <button onClick={() => setStep(0)} className="flex-1 py-4 border border-neutral-700 text-neutral-300 text-sm font-medium pixel-btn-ghost">
-                ← Back
+                â† Back
               </button>
-              <button onClick={() => setStep(2)} className="flex-1 py-4 font-semibold text-neutral-950 pixel-btn" style={{ background: "#CCFF47" }}>
-                Next →
+              <button onClick={() => setStep(2)} className="flex-1 py-4 font-semibold text-neutral-950 pixel-btn" style={{ background: "var(--accent)" }}>
+                Next â†’
               </button>
             </div>
           </div>
@@ -119,13 +119,13 @@ export default function Onboarding({ onComplete, onCancel }) {
             </div>
             <div className="flex gap-3">
               <button onClick={() => setStep(1)} className="flex-1 py-4 border border-neutral-700 text-neutral-300 text-sm font-medium pixel-btn-ghost">
-                ← Back
+                â† Back
               </button>
               <button
                 onClick={finish}
                 disabled={gear.length === 0}
                 className="flex-1 py-4 font-semibold text-neutral-950 disabled:opacity-40 pixel-btn"
-                style={{ background: "#CCFF47" }}
+                style={{ background: "var(--accent)" }}
               >
                 Let's go!
               </button>
@@ -141,7 +141,7 @@ export default function Onboarding({ onComplete, onCancel }) {
               className="h-1 transition-all"
               style={{
                 width: i === step ? 24 : 10,
-                background: i === step ? "#CCFF47" : "#333",
+                background: i === step ? "var(--accent)" : "#333",
               }}
             />
           ))}

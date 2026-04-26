@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { exercises as libraryExercises } from "../data/exercises";
 
 export default function ExercisePicker({ onPick, onClose, customExercises = [] }) {
@@ -14,7 +14,7 @@ export default function ExercisePicker({ onPick, onClose, customExercises = [] }
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
       <div className="relative w-full max-w-sm bg-neutral-950 border border-neutral-700 pixel-card mx-4 mb-4 md:mb-0 flex flex-col max-h-[75vh]">
         <div className="p-4 border-b border-neutral-800">
-          <h3 className="font-display mb-3" style={{ color: "#CCFF47", fontSize: "9px", letterSpacing: "0.12em" }}>
+          <h3 className="font-display mb-3" style={{ color: "var(--accent)", fontSize: "9px", letterSpacing: "0.12em" }}>
             ADD EXERCISE
           </h3>
           <input
@@ -49,7 +49,7 @@ export default function ExercisePicker({ onPick, onClose, customExercises = [] }
                 <span className="text-white text-sm">{ex.name}</span>
               </div>
               <span className="block text-xs text-neutral-600 mt-0.5">
-                {ex.difficulty} · {ex.primary?.join(", ")}
+                {ex.difficulty} Â· {ex.primary?.join(", ")}
               </span>
             </button>
           ))}

@@ -1,4 +1,4 @@
-const ACCENT = "#CCFF47";
+﻿const ACCENT = "var(--accent)";
 const MUTED  = "#6ea825";
 
 const MUSCLE_PATHS = {
@@ -59,7 +59,7 @@ function Silhouette() {
       <ellipse cx="90" cy="34" rx="14" ry="17" />
       {/* Neck */}
       <path d="M86 50 L94 50 L94 63 L86 63Z" />
-      {/* Torso — solid trapezoid, shoulders to waist */}
+      {/* Torso â€” solid trapezoid, shoulders to waist */}
       <path d="M68 61 Q90 57 112 61 L107 138 Q90 142 73 138Z" />
       {/* Hips / pelvis */}
       <path d="M73 138 Q90 142 107 138 L109 160 Q90 164 71 160Z" />

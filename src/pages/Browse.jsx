@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { workouts, CATEGORIES } from "../data/workouts";
 
@@ -31,7 +31,7 @@ export default function Browse({ profile, customWorkouts = [], onDeleteCustom })
         <Link
           to="/create"
           className="px-4 py-2 text-xs font-display text-neutral-950 pixel-btn"
-          style={{ background: "#CCFF47", fontSize: "7px", letterSpacing: "0.1em" }}
+          style={{ background: "var(--accent)", fontSize: "7px", letterSpacing: "0.1em" }}
         >
           + CREATE
         </Link>
@@ -110,7 +110,7 @@ export default function Browse({ profile, customWorkouts = [], onDeleteCustom })
                   onClick={(e) => { e.preventDefault(); onDeleteCustom(w.id); }}
                   className="absolute top-3 right-10 opacity-0 group-hover:opacity-100 text-neutral-600 hover:text-red-400 text-xs transition-all px-1"
                 >
-                  ✕
+                  âœ•
                 </button>
               )}
             </div>

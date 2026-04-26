@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+﻿import { NavLink } from "react-router-dom";
 
 const links = [
   {
@@ -91,7 +91,7 @@ export default function Nav({ theme = "dark", onToggleTheme }) {
 
       {/* Desktop side */}
       <nav className="fixed top-0 left-0 h-full w-20 bg-neutral-950 border-r-2 border-neutral-800 hidden md:flex flex-col items-center py-8 gap-8 z-50">
-        <div className="font-display text-center mb-2" style={{ color: "#CCFF47", fontSize: "7px", letterSpacing: "0.2em", lineHeight: "2", writingMode: "vertical-rl", transform: "rotate(180deg)" }}>
+        <div className="font-display text-center mb-2" style={{ color: "var(--accent)", fontSize: "7px", letterSpacing: "0.2em", lineHeight: "2", writingMode: "vertical-rl", transform: "rotate(180deg)" }}>
           GYMBUDDY
         </div>
         {links.map(({ to, label, icon, end }) => (

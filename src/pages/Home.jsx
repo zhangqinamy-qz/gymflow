@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link } from "react-router-dom";
 import { workouts, CATEGORIES } from "../data/workouts";
 import ProfileSwitcher from "../components/ProfileSwitcher";
@@ -55,7 +55,7 @@ function SquadSection({ profile, activeId, squadLeaderboard, onCreateSquad, onJo
               onClick={handleJoin}
               disabled={joining || !joinCode.trim()}
               className="px-4 py-2 font-display text-neutral-950 pixel-btn disabled:opacity-40"
-              style={{ background: "#CCFF47", fontSize: "8px", letterSpacing: "0.1em" }}
+              style={{ background: "var(--accent)", fontSize: "8px", letterSpacing: "0.1em" }}
             >
               {joining ? "..." : "JOIN"}
             </button>
@@ -94,7 +94,7 @@ function SquadSection({ profile, activeId, squadLeaderboard, onCreateSquad, onJo
 
       <div className="bg-neutral-900 pixel-card p-4 mb-3 flex items-center justify-between">
         <div>
-          <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.12em" }}>SQUAD CODE — share with friends</p>
+          <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.12em" }}>SQUAD CODE â€” share with friends</p>
           <p className="font-display text-white mt-1" style={{ fontSize: "22px", letterSpacing: "0.3em" }}>{profile.squadId}</p>
         </div>
         <button
@@ -127,7 +127,7 @@ function SquadSection({ profile, activeId, squadLeaderboard, onCreateSquad, onJo
                 </div>
                 <div className="flex-shrink-0 text-right">
                   <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>{m.stars}</p>
-                  <p className="text-neutral-600" style={{ fontSize: "9px" }}>★ stars</p>
+                  <p className="text-neutral-600" style={{ fontSize: "9px" }}>â˜… stars</p>
                 </div>
               </div>
             );
@@ -135,7 +135,7 @@ function SquadSection({ profile, activeId, squadLeaderboard, onCreateSquad, onJo
         </div>
       ) : (
         <p className="text-neutral-600 text-sm text-center py-3">
-          No sessions yet — log a workout to appear here!
+          No sessions yet â€” log a workout to appear here!
         </p>
       )}
     </div>
@@ -148,14 +148,14 @@ const catColor = {
   [CATEGORIES.STRENGTH]: "text-lime-400",
 };
 
-const RANK_COLORS = ["#CCFF47", "#aaaaaa", "#cd7f32"];
+const RANK_COLORS = ["var(--accent)", "#aaaaaa", "#cd7f32"];
 const RANK_LABELS = ["01", "02", "03", "04", "05"];
 
 function Stars({ count, size = "sm" }) {
   const px = size === "lg" ? "14px" : "10px";
   return (
-    <span style={{ color: "#CCFF47", fontSize: px, letterSpacing: "2px" }}>
-      {"★".repeat(count)}{"☆".repeat(3 - count)}
+    <span style={{ color: "var(--accent)", fontSize: px, letterSpacing: "2px" }}>
+      {"â˜…".repeat(count)}{"â˜†".repeat(3 - count)}
     </span>
   );
 }
@@ -222,7 +222,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
       <div className="flex items-start justify-between mb-8">
         <div>
           <p className="text-neutral-600 font-display" style={{ fontSize: "7px", letterSpacing: "0.15em" }}>{greet()}</p>
-          <h1 className="font-display mt-2" style={{ color: "#CCFF47", fontSize: "22px", letterSpacing: "0.2em", lineHeight: "1.4" }}>
+          <h1 className="font-display mt-2" style={{ color: "var(--accent)", fontSize: "22px", letterSpacing: "0.2em", lineHeight: "1.4" }}>
             GYMBUDDY
           </h1>
         </div>
@@ -236,7 +236,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
             </span>
           </div>
           <span className="text-white text-xs font-medium">{profile?.name || "Select"}</span>
-          <span className="text-neutral-600 text-xs">▾</span>
+          <span className="text-neutral-600 text-xs">â–¾</span>
         </button>
       </div>
 
@@ -244,18 +244,18 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
       <div className="grid grid-cols-3 gap-2 mb-6">
         <div className="bg-neutral-900 pixel-card p-4">
           <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.1em" }}>THIS WEEK</p>
-          <p className="font-display mt-2 mb-0.5" style={{ color: "#CCFF47", fontSize: "24px" }}>{sessionsThisWeek}</p>
+          <p className="font-display mt-2 mb-0.5" style={{ color: "var(--accent)", fontSize: "24px" }}>{sessionsThisWeek}</p>
           <p className="text-neutral-600 text-xs">sessions</p>
         </div>
         <div className="bg-neutral-900 pixel-card p-4">
           <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.1em" }}>ALL TIME</p>
-          <p className="font-display mt-2 mb-0.5" style={{ color: "#CCFF47", fontSize: "24px" }}>{history.length}</p>
+          <p className="font-display mt-2 mb-0.5" style={{ color: "var(--accent)", fontSize: "24px" }}>{history.length}</p>
           <p className="text-neutral-600 text-xs">sessions</p>
         </div>
         <div className="bg-neutral-900 pixel-card p-4">
           <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.1em" }}>MY STARS</p>
-          <p className="font-display mt-2 mb-0.5" style={{ color: "#CCFF47", fontSize: "24px" }}>{totalStars}</p>
-          <p className="text-neutral-600 text-xs">★ earned</p>
+          <p className="font-display mt-2 mb-0.5" style={{ color: "var(--accent)", fontSize: "24px" }}>{totalStars}</p>
+          <p className="text-neutral-600 text-xs">â˜… earned</p>
         </div>
       </div>
 
@@ -270,7 +270,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
         <Link
           to="/create"
           className="flex items-center justify-center gap-2 py-3 pixel-btn font-display text-neutral-950 transition-colors"
-          style={{ background: "#CCFF47", fontSize: "8px", letterSpacing: "0.12em" }}
+          style={{ background: "var(--accent)", fontSize: "8px", letterSpacing: "0.12em" }}
         >
           + CREATE
         </Link>
@@ -328,14 +328,14 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
                   {/* Stars */}
                   <div className="flex-shrink-0 text-right">
                     <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>{p.stars}</p>
-                    <p className="text-neutral-600" style={{ fontSize: "9px" }}>★ stars</p>
+                    <p className="text-neutral-600" style={{ fontSize: "9px" }}>â˜… stars</p>
                   </div>
                 </div>
               );
             })}
           </div>
           <p className="text-neutral-700 text-xs mt-2 text-center">
-            1★ per session · 3★ for 60+ min workouts
+            1â˜… per session Â· 3â˜… for 60+ min workouts
           </p>
         </div>
       )}
@@ -343,7 +343,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
       {/* Recommended */}
       <div className="flex items-center justify-between mb-3">
         <h2 className="font-display text-white" style={{ fontSize: "9px", letterSpacing: "0.12em" }}>RECOMMENDED</h2>
-        <Link to="/browse" className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors">See all →</Link>
+        <Link to="/browse" className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors">See all â†’</Link>
       </div>
       <div className="flex flex-col gap-3">
         {featured.map((w) => w && <WorkoutCard key={w.id} workout={w} />)}

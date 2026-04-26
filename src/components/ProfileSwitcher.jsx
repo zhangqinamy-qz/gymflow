@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 
 export default function ProfileSwitcher({ profiles, activeId, onSwitch, onAddProfile, onDeleteProfile, onClose }) {
   const [confirmDelete, setConfirmDelete] = useState(null); // profile id pending delete
@@ -15,7 +15,7 @@ export default function ProfileSwitcher({ profiles, activeId, onSwitch, onAddPro
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
 
       <div className="relative w-full max-w-sm bg-neutral-950 border border-neutral-700 pixel-card p-6 mx-4 mb-4 md:mb-0">
-        <h2 className="font-display mb-5" style={{ color: "#CCFF47", fontSize: "9px", letterSpacing: "0.12em" }}>
+        <h2 className="font-display mb-5" style={{ color: "var(--accent)", fontSize: "9px", letterSpacing: "0.12em" }}>
           WHO'S WORKING OUT?
         </h2>
 
@@ -49,7 +49,7 @@ export default function ProfileSwitcher({ profiles, activeId, onSwitch, onAddPro
                     onClick={() => setConfirmDelete(null)}
                     className="px-3 text-xs border border-neutral-700 text-neutral-500 hover:border-neutral-500 transition-colors"
                   >
-                    ✕
+                    âœ•
                   </button>
                 </div>
               ) : (
@@ -58,7 +58,7 @@ export default function ProfileSwitcher({ profiles, activeId, onSwitch, onAddPro
                   className="px-3 border border-neutral-800 text-neutral-700 hover:border-red-800 hover:text-red-500 transition-colors text-xs"
                   title="Delete profile"
                 >
-                  🗑
+                  ðŸ—‘
                 </button>
               )}
             </div>

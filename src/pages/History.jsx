@@ -1,9 +1,9 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link } from "react-router-dom";
 import { CATEGORIES } from "../data/workouts";
 import { exerciseById } from "../data/exercises";
 
-const PROFILE_COLORS = ["#CCFF47", "#38bdf8", "#f472b6", "#fb923c", "#a78bfa", "#34d399"];
+const PROFILE_COLORS = ["var(--accent)", "#38bdf8", "#f472b6", "#fb923c", "#a78bfa", "#34d399"];
 
 const catTag = {
   [CATEGORIES.RUNNING]:  "text-orange-400 border-orange-900 bg-orange-950",
@@ -32,7 +32,7 @@ function Calendar({ allHistory, profiles }) {
     else setMonth((m) => m + 1);
   };
 
-  // Build dayMap: "YYYY-MM-DD" → { [profileId]: { color, stars, name } }
+  // Build dayMap: "YYYY-MM-DD" â†’ { [profileId]: { color, stars, name } }
   const dayMap = {};
   profiles.forEach((p, i) => {
     const color = PROFILE_COLORS[i % PROFILE_COLORS.length];
@@ -55,11 +55,11 @@ function Calendar({ allHistory, profiles }) {
     <div className="bg-neutral-900 pixel-card p-4 mb-8">
       {/* Month nav */}
       <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="text-neutral-600 hover:text-neutral-400 px-2 py-1 text-sm transition-colors">←</button>
+        <button onClick={prevMonth} className="text-neutral-600 hover:text-neutral-400 px-2 py-1 text-sm transition-colors">â†</button>
         <span className="font-display text-white" style={{ fontSize: "9px", letterSpacing: "0.15em" }}>
           {MONTHS[month]} {year}
         </span>
-        <button onClick={nextMonth} className="text-neutral-600 hover:text-neutral-400 px-2 py-1 text-sm transition-colors">→</button>
+        <button onClick={nextMonth} className="text-neutral-600 hover:text-neutral-400 px-2 py-1 text-sm transition-colors">â†’</button>
       </div>
 
       {/* Day-of-week headers */}
@@ -107,8 +107,8 @@ function Calendar({ allHistory, profiles }) {
 
               {/* Stars */}
               {maxStars > 0 && (
-                <span style={{ color: "#CCFF47", fontSize: "5px", lineHeight: 1, marginTop: "1px" }}>
-                  {"★".repeat(maxStars === 3 ? 3 : 1)}
+                <span style={{ color: "var(--accent)", fontSize: "5px", lineHeight: 1, marginTop: "1px" }}>
+                  {"â˜…".repeat(maxStars === 3 ? 3 : 1)}
                 </span>
               )}
             </div>
@@ -152,7 +152,7 @@ export default function History({ history, profile, allHistory = {}, profiles = 
           { label: "THIS WEEK", value: thisWeek },
         ].map(({ label, value }) => (
           <div key={label} className="bg-neutral-900 pixel-card p-4 text-center">
-            <p className="font-display mb-1" style={{ color: "#CCFF47", fontSize: "22px" }}>{value}</p>
+            <p className="font-display mb-1" style={{ color: "var(--accent)", fontSize: "22px" }}>{value}</p>
             <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.1em" }}>{label}</p>
           </div>
         ))}
@@ -166,7 +166,7 @@ export default function History({ history, profile, allHistory = {}, profiles = 
           <p className="font-display text-neutral-700 mb-4" style={{ fontSize: "24px" }}>[ ]</p>
           <p className="text-neutral-600 text-sm">No workouts logged yet.</p>
           <Link to="/browse" className="inline-block mt-4 text-lime-400 text-sm hover:text-lime-300 transition-colors">
-            Browse workouts →
+            Browse workouts â†’
           </Link>
         </div>
       ) : (
@@ -177,8 +177,8 @@ export default function History({ history, profile, allHistory = {}, profiles = 
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="text-white text-sm font-medium">{log.title}</p>
-                    <span style={{ color: "#CCFF47", fontSize: "10px", letterSpacing: "1px" }}>
-                      {"★".repeat(log.stars || 1)}
+                    <span style={{ color: "var(--accent)", fontSize: "10px", letterSpacing: "1px" }}>
+                      {"â˜…".repeat(log.stars || 1)}
                     </span>
                   </div>
                   <p className="text-neutral-600 text-xs mt-0.5">{formatDate(log.date)}</p>
@@ -194,7 +194,7 @@ export default function History({ history, profile, allHistory = {}, profiles = 
                       <span className="text-sky-400 text-xs">{log.distance} {log.distanceUnit}</span>
                     )}
                     {log.heartRate && (
-                      <span className="text-red-400 text-xs">♥ {log.heartRate} bpm</span>
+                      <span className="text-red-400 text-xs">â™¥ {log.heartRate} bpm</span>
                     )}
                   </div>
                 </div>
@@ -210,7 +210,7 @@ export default function History({ history, profile, allHistory = {}, profiles = 
                     className="opacity-0 group-hover:opacity-100 text-neutral-700 hover:text-red-500 transition-all text-sm px-1"
                     title="Delete entry"
                   >
-                    ✕
+                    âœ•
                   </button>
                 </div>
               </div>
@@ -226,7 +226,7 @@ export default function History({ history, profile, allHistory = {}, profiles = 
             EXCLUDED EXERCISES
           </h2>
           <p className="text-neutral-600 text-xs mb-3">
-            {profile.name}'s excluded list — tap 👎 to restore.
+            {profile.name}'s excluded list â€” tap ðŸ‘Ž to restore.
           </p>
           <div className="flex flex-col gap-2">
             {profile.dislikedExercises.map((id) => {
@@ -243,7 +243,7 @@ export default function History({ history, profile, allHistory = {}, profiles = 
                     className="px-3 py-1.5 text-sm border border-orange-700 bg-orange-950 text-orange-400 hover:bg-orange-900 transition-colors"
                     title="Remove from excluded"
                   >
-                    👎
+                    ðŸ‘Ž
                   </button>
                 </div>
               );
