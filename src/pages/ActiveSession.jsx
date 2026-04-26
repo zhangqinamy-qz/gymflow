@@ -220,7 +220,6 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
         elapsedMin={elapsedMin}
         onSubmit={(data) => {
           const log = {
-            id: workout.id,
             title: workout.title,
             category: workout.category,
             date: new Date().toISOString(),
