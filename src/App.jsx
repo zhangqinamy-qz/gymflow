@@ -44,11 +44,28 @@ export default function App() {
   const profile = profiles.find((p) => p.id === activeId) || null;
   const history = allHistory[activeId] || [];
 
-  const handleOnboardingComplete = ({ name, level, equipment }) => {
+  const handleOnboardingComplete = async ({ name, level, equipment, squadCode }) => {
     const newProfile = { id: Date.now().toString(), name, level, equipment };
     setProfiles((prev) => [...prev, newProfile]);
     setActiveId(newProfile.id);
     setAddingProfile(false);
+
+    if (squadCode && supabase) {
+      try {
+        const upper = squadCode.toUpperCase().trim();
+        const { data: squadData } = await supabase.from("squads").select("id").eq("id", upper).single();
+        if (squadData) {
+          const { data: members } = await supabase.from("squad_members").select("name, profile_id").eq("squad_id", upper);
+          const conflict = members?.find((m) => m.name.toLowerCase() === name.toLowerCase() && m.profile_id !== newProfile.id);
+          if (!conflict) {
+            await supabase.from("squad_members").upsert({ profile_id: newProfile.id, squad_id: upper, name });
+            setProfiles((prev) => prev.map((p) => p.id === newProfile.id ? { ...p, squadId: upper } : p));
+          }
+        }
+      } catch (_) {
+        // silently fail — user can join from the squad section on Home
+      }
+    }
   };
 
   // ─── Squad leaderboard ────────────────────────────────────────────────────

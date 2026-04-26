@@ -11,15 +11,16 @@ const levelDesc = {
 };
 
 export default function Onboarding({ onComplete, onCancel }) {
-  const [step, setStep]   = useState(0);
-  const [name, setName]   = useState("");
-  const [level, setLevel] = useState("Beginner");
-  const [gear, setGear]   = useState(["Bodyweight"]);
+  const [step, setStep]         = useState(0);
+  const [name, setName]         = useState("");
+  const [level, setLevel]       = useState("Beginner");
+  const [gear, setGear]         = useState(["Bodyweight"]);
+  const [squadCode, setSquadCode] = useState("");
 
   const toggleGear = (item) =>
     setGear((g) => g.includes(item) ? g.filter((x) => x !== item) : [...g, item]);
 
-  const finish = () => onComplete({ name: name.trim() || "Athlete", level, equipment: gear });
+  const finish = () => onComplete({ name: name.trim() || "Athlete", level, equipment: gear, squadCode: squadCode.trim() });
 
   return (
     <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center px-6">
@@ -122,12 +123,44 @@ export default function Onboarding({ onComplete, onCancel }) {
                 ← Back
               </button>
               <button
-                onClick={finish}
+                onClick={() => setStep(3)}
                 disabled={gear.length === 0}
                 className="flex-1 py-4 font-semibold text-neutral-950 disabled:opacity-40 pixel-btn"
                 style={{ background: "var(--accent)" }}
               >
-                Let's go!
+                Next →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Squad code */}
+        {step === 3 && (
+          <div>
+            <h2 className="font-display text-xs text-white mb-2" style={{ lineHeight: "1.8" }}>
+              GOT A<br />SQUAD CODE?
+            </h2>
+            <p className="text-neutral-600 text-xs mb-5">Enter your friend's code to join their leaderboard. Leave blank to skip — you can join later from the home screen.</p>
+            <input
+              type="text"
+              placeholder="e.g. ABC123"
+              value={squadCode}
+              onChange={(e) => setSquadCode(e.target.value.toUpperCase())}
+              onKeyDown={(e) => e.key === "Enter" && finish()}
+              autoFocus
+              maxLength={6}
+              className="w-full bg-neutral-900 border border-neutral-700 text-white text-lg px-4 py-4 placeholder-neutral-600 focus:outline-none focus:border-neutral-500 mb-4 pixel-card tracking-widest text-center"
+            />
+            <div className="flex gap-3">
+              <button onClick={() => setStep(2)} className="flex-1 py-4 border border-neutral-700 text-neutral-300 text-sm font-medium pixel-btn-ghost">
+                ← Back
+              </button>
+              <button
+                onClick={finish}
+                className="flex-1 py-4 font-semibold text-neutral-950 pixel-btn"
+                style={{ background: "var(--accent)" }}
+              >
+                {squadCode.trim() ? "Join & Start →" : "Start →"}
               </button>
             </div>
           </div>
@@ -135,7 +168,7 @@ export default function Onboarding({ onComplete, onCancel }) {
 
         {/* Step dots */}
         <div className="flex gap-2 justify-center mt-8">
-          {[0, 1, 2].map((i) => (
+          {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
               className="h-1 transition-all"
