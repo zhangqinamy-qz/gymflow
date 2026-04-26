@@ -52,9 +52,10 @@ export default function App() {
       if (cancelled || !data) return;
       const agg = {};
       data.forEach(({ profile_id, profile_name, stars }) => {
-        if (!agg[profile_id]) agg[profile_id] = { id: profile_id, name: profile_name, stars: 0, sessions: 0 };
-        agg[profile_id].stars += stars || 1;
-        agg[profile_id].sessions++;
+        const key = profile_name.toLowerCase();
+        if (!agg[key]) agg[key] = { id: profile_id, name: profile_name, stars: 0, sessions: 0 };
+        agg[key].stars += stars || 1;
+        agg[key].sessions++;
       });
       setSquadLeaderboard(Object.values(agg).sort((a, b) => b.stars - a.stars));
     };
@@ -84,7 +85,15 @@ export default function App() {
     const upper = code.toUpperCase().trim();
     const { data, error } = await supabase.from("squads").select("id").eq("id", upper).single();
     if (error || !data) throw new Error("Squad not found — check the code and try again.");
-    await supabase.from("squad_members").upsert({ profile_id: profile.id, squad_id: upper, name: profile.name });
+    const { data: members } = await supabase
+      .from("squad_members")
+      .select("name, profile_id")
+      .eq("squad_id", upper);
+    const conflict = members?.find(
+      (m) => m.name.toLowerCase() === profile.name.toLowerCase() && m.profile_id !== activeId
+    );
+    if (conflict) throw new Error(`"${profile.name}" is already taken in this squad. Change your name in Settings first.`);
+    await supabase.from("squad_members").upsert({ profile_id: activeId, squad_id: upper, name: profile.name });
     setProfiles((prev) => prev.map((p) => p.id === activeId ? { ...p, squadId: upper } : p));
   };
 
