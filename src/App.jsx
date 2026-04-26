@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { supabase } from "./lib/supabase";
@@ -11,13 +11,27 @@ import History from "./pages/History";
 import CreateWorkout from "./pages/CreateWorkout";
 import Nav from "./components/Nav";
 
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+const rowToEntry = (row) => ({
+  id:           row.id,
+  date:         row.date,
+  title:        row.title,
+  duration:     row.duration,
+  stars:        row.stars,
+  calories:     row.calories,
+  distance:     row.distance,
+  distanceUnit: row.distance_unit,
+  heartRate:    row.heart_rate,
+});
+
 export default function App() {
-  const [profiles, setProfiles]           = useLocalStorage("gym_profiles", []);
-  const [activeId, setActiveId]           = useLocalStorage("gym_active_id", null);
-  const [allHistory, setAllHistory]       = useLocalStorage("gym_all_history", {});
+  const [profiles, setProfiles]             = useLocalStorage("gym_profiles", []);
+  const [activeId, setActiveId]             = useLocalStorage("gym_active_id", null);
+  const [allHistory, setAllHistory]         = useLocalStorage("gym_all_history", {});
   const [customWorkouts, setCustomWorkouts] = useLocalStorage("gym_custom_workouts", []);
   const [customExercises, setCustomExercises] = useLocalStorage("gym_custom_exercises", []);
-  const [theme, setTheme] = useLocalStorage("gym_theme", "dark");
+  const [theme, setTheme]                   = useLocalStorage("gym_theme", "dark");
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -37,7 +51,7 @@ export default function App() {
     setAddingProfile(false);
   };
 
-  // ─── Squad ────────────────────────────────────────────────────────────────
+  // ─── Squad leaderboard ────────────────────────────────────────────────────
   const [squadLeaderboard, setSquadLeaderboard] = useState([]);
 
   useEffect(() => {
@@ -70,6 +84,59 @@ export default function App() {
     return () => { cancelled = true; supabase.removeChannel(channel); };
   }, [profile?.squadId]);
 
+  // ─── History sync ─────────────────────────────────────────────────────────
+  const activeIdRef = useRef(activeId);
+  useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
+
+  useEffect(() => {
+    if (!supabase || !profile?.squadId || !profile?.name) return;
+    let cancelled = false;
+
+    const mergeRemote = (rows) => {
+      setAllHistory((h) => {
+        const id = activeIdRef.current;
+        const local = h[id] || [];
+        const localIds = new Set(local.map((e) => e.id).filter(Boolean));
+        const incoming = rows
+          .filter((row) => !localIds.has(row.id))
+          .map(rowToEntry);
+        if (incoming.length === 0) return h;
+        const merged = [...incoming, ...local].sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+        return { ...h, [id]: merged };
+      });
+    };
+
+    const fetchHistory = async () => {
+      const { data } = await supabase
+        .from("workout_history")
+        .select("*")
+        .eq("squad_id", profile.squadId)
+        .eq("profile_name", profile.name)
+        .order("date", { ascending: false });
+      if (cancelled || !data) return;
+      mergeRemote(data);
+    };
+
+    fetchHistory();
+
+    const channel = supabase
+      .channel(`history:${profile.squadId}:${profile.name}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "workout_history", filter: `squad_id=eq.${profile.squadId}` },
+        (payload) => {
+          if (payload.new.profile_name.toLowerCase() !== profile.name.toLowerCase()) return;
+          mergeRemote([payload.new]);
+        }
+      )
+      .subscribe();
+
+    return () => { cancelled = true; supabase.removeChannel(channel); };
+  }, [profile?.squadId, profile?.name]);
+
+  // ─── Squad join / create / leave ──────────────────────────────────────────
   const createSquad = async () => {
     if (!supabase || !profile) throw new Error("Supabase not configured");
     const code = Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -101,25 +168,39 @@ export default function App() {
     setProfiles((prev) => prev.map((p) => p.id === activeId ? { ...p, squadId: null } : p));
     setSquadLeaderboard([]);
   };
-  // ──────────────────────────────────────────────────────────────────────────
 
+  // ─── Log workout ──────────────────────────────────────────────────────────
   const addToHistory = (log) => {
     const stars = (log.duration || 0) >= 60 ? 3 : (log.duration || 0) >= 45 ? 2 : 1;
-    setAllHistory((h) => ({ ...h, [activeId]: [{ ...log, stars }, ...(h[activeId] || [])] }));
+    const entry = { ...log, stars, id: log.id || uid() };
+    setAllHistory((h) => ({ ...h, [activeId]: [entry, ...(h[activeId] || [])] }));
     if (supabase && profile?.squadId) {
       supabase.from("squad_sessions").insert({
-        squad_id: profile.squadId,
-        profile_id: activeId,
+        squad_id:     profile.squadId,
+        profile_id:   activeId,
         profile_name: profile.name,
-        title: log.title,
-        date: log.date,
-        duration: log.duration || 0,
+        title:        log.title,
+        date:         log.date,
+        duration:     log.duration || 0,
         stars,
+      });
+      supabase.from("workout_history").insert({
+        id:           entry.id,
+        squad_id:     profile.squadId,
+        profile_name: profile.name,
+        date:         entry.date,
+        title:        entry.title,
+        duration:     entry.duration || 0,
+        stars,
+        calories:     entry.calories     || null,
+        distance:     entry.distance     || null,
+        distance_unit: entry.distanceUnit || null,
+        heart_rate:   entry.heartRate    || null,
       });
     }
   };
 
-  // Leaderboard: all profiles ranked by total stars
+  // ─── Leaderboard (local profiles) ────────────────────────────────────────
   const leaderboard = profiles
     .map((p) => ({
       ...p,
