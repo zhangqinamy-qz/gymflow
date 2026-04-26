@@ -221,22 +221,26 @@ function ExerciseRow({ item, index, onChange, onRemove }) {
         <span className="text-white text-sm font-medium flex-1">{item.name}</span>
         <button onClick={onRemove} className="text-neutral-600 hover:text-red-400 px-1">✕</button>
       </div>
-      <div className="flex gap-2 pl-7">
-        <div className="flex flex-col gap-0.5">
-          <label className="text-xs text-neutral-600">Sets</label>
-          <input type="number" min="1" value={item.sets}
-            onChange={(e) => onChange({ ...item, sets: e.target.value })}
-            className="w-14 bg-neutral-800 border border-neutral-700 text-white text-sm px-2 py-1 text-center"
-          />
+      {item.isGame ? (
+        <p className="text-neutral-600 text-xs pl-7">Full game</p>
+      ) : (
+        <div className="flex gap-2 pl-7">
+          <div className="flex flex-col gap-0.5">
+            <label className="text-xs text-neutral-600">Sets</label>
+            <input type="number" min="1" value={item.sets}
+              onChange={(e) => onChange({ ...item, sets: e.target.value })}
+              className="w-14 bg-neutral-800 border border-neutral-700 text-white text-sm px-2 py-1 text-center"
+            />
+          </div>
+          <div className="flex flex-col gap-0.5 flex-1">
+            <label className="text-xs text-neutral-600">Reps / Duration</label>
+            <input type="text" placeholder="e.g. 10 or 30 sec" value={item.repsOrDuration}
+              onChange={(e) => onChange({ ...item, repsOrDuration: e.target.value })}
+              className="w-full bg-neutral-800 border border-neutral-700 text-white text-sm px-2 py-1"
+            />
+          </div>
         </div>
-        <div className="flex flex-col gap-0.5 flex-1">
-          <label className="text-xs text-neutral-600">Reps / Duration</label>
-          <input type="text" placeholder="e.g. 10 or 30 sec" value={item.repsOrDuration}
-            onChange={(e) => onChange({ ...item, repsOrDuration: e.target.value })}
-            className="w-full bg-neutral-800 border border-neutral-700 text-white text-sm px-2 py-1"
-          />
-        </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -281,7 +285,14 @@ export default function CreateWorkout({ onSaveWorkout, onSaveExercise, customExe
     ...Object.fromEntries(customExercises.map((e) => [e.id, e])),
   };
 
-  const addExercise    = (item) => setItems((p) => [...p, item]);
+  const addExercise = (item) => {
+    const ex = allExById[item.exerciseId];
+    if (ex?.isGame) {
+      setItems((p) => [...p, { exerciseId: item.exerciseId, name: item.name, isGame: true }]);
+    } else {
+      setItems((p) => [...p, item]);
+    }
+  };
   const updateItem     = (i, u) => setItems((p) => p.map((x, idx) => idx === i ? u : x));
   const removeItem     = (i)    => setItems((p) => p.filter((_, idx) => idx !== i));
   const removeWarmup   = (i)    => setWarmupItems((p) => p.filter((_, idx) => idx !== i));
@@ -315,12 +326,11 @@ export default function CreateWorkout({ onSaveWorkout, onSaveExercise, customExe
       description: "Custom workout",
       isCustom: true,
       warmup: warmupItems,
-      main: items.map((item) => ({
-        exerciseId: item.exerciseId || null,
-        name: item.name,
-        sets: parseInt(item.sets) || 3,
-        reps: item.repsOrDuration,
-      })),
+      main: items.map((item) =>
+        item.isGame
+          ? { exerciseId: item.exerciseId, name: item.name, duration: "Full game" }
+          : { exerciseId: item.exerciseId || null, name: item.name, sets: parseInt(item.sets) || 3, reps: item.repsOrDuration }
+      ),
       cooldown: cooldownItems,
     });
     navigate("/browse");
