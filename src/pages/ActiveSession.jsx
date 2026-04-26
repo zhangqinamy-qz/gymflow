@@ -240,9 +240,11 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
   const isLast = current === steps.length - 1;
   const phaseColor = phaseColors[step?.phase] || "var(--accent)";
 
-  const detail = step?.sets
-    ? `${step.sets} × ${step.reps || step.duration}`
-    : step?.reps || step?.duration || "";
+  const detail = step?.ex?.isGame
+    ? "Play game"
+    : step?.sets
+      ? `${step.sets} × ${step.reps || step.duration}`
+      : step?.reps || step?.duration || "";
 
   const advance = () => {
     if (isLast) {

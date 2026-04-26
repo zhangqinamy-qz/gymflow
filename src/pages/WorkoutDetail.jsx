@@ -249,7 +249,13 @@ export default function WorkoutDetail({
 
   const handlePickExercise = (item) => {
     setShowPicker(false);
-    setPendingItem(item);
+    const ex = allExercisesById[item.exerciseId];
+    if (ex?.isGame) {
+      setDraft((d) => ({ ...d, [pickerPhase]: [...(d[pickerPhase] || []), { exerciseId: item.exerciseId, name: item.name, duration: "Full game" }] }));
+      setPickerPhase(null);
+    } else {
+      setPendingItem(item);
+    }
   };
 
   const confirmAddItem = (newItem) => {
