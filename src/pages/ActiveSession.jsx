@@ -51,18 +51,19 @@ function LogForm({ workout, elapsedMin, onSubmit }) {
     });
   };
 
-  const Field = ({ label, value, onChange, placeholder, type = "number", suffix }) => (
-    <div className="mb-4">
-      <label className="block font-display text-neutral-500 mb-2" style={{ fontSize: "7px", letterSpacing: "0.12em" }}>
+  const Field = ({ label, value, onChange, placeholder, inputMode = "numeric", suffix }) => (
+    <div className="mb-3">
+      <label className="block font-display text-neutral-500 mb-1.5" style={{ fontSize: "7px", letterSpacing: "0.12em" }}>
         {label}
       </label>
       <div className="flex gap-2">
         <input
-          type={type}
+          type="text"
+          inputMode={inputMode}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="flex-1 bg-neutral-900 border border-neutral-700 text-white px-4 py-3 text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-500 pixel-card"
+          className="flex-1 bg-neutral-900 border border-neutral-700 text-white px-4 py-2.5 text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-500 pixel-card"
         />
         {suffix && <span className="flex items-center text-neutral-500 text-sm px-2">{suffix}</span>}
       </div>
@@ -70,10 +71,10 @@ function LogForm({ workout, elapsedMin, onSubmit }) {
   );
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex flex-col px-4 pt-8 max-w-md mx-auto">
-      <div className="mb-6">
-        <p className="font-display mb-2" style={{ color: "var(--accent)", fontSize: "22px" }}>★</p>
-        <h2 className="font-display text-white mb-1" style={{ fontSize: "14px", letterSpacing: "0.15em", lineHeight: "1.5" }}>
+    <div className="min-h-screen bg-neutral-950 flex flex-col px-4 pt-4 max-w-md mx-auto">
+      <div className="mb-3">
+        <p className="font-display mb-1" style={{ color: "var(--accent)", fontSize: "18px" }}>★</p>
+        <h2 className="font-display text-white mb-0.5" style={{ fontSize: "14px", letterSpacing: "0.15em", lineHeight: "1.5" }}>
           LOG SESSION
         </h2>
         <p className="text-neutral-600 text-sm">{workout.title}</p>
@@ -94,22 +95,23 @@ function LogForm({ workout, elapsedMin, onSubmit }) {
 
       {isRunning && (
         <>
-          <div className="mb-4">
-            <label className="block font-display text-neutral-500 mb-2" style={{ fontSize: "7px", letterSpacing: "0.12em" }}>
+          <div className="mb-3">
+            <label className="block font-display text-neutral-500 mb-1.5" style={{ fontSize: "7px", letterSpacing: "0.12em" }}>
               DISTANCE (OPTIONAL)
             </label>
             <div className="flex gap-2">
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
                 value={distance}
                 onChange={(e) => setDistance(e.target.value)}
                 placeholder="e.g. 5.2"
-                className="flex-1 bg-neutral-900 border border-neutral-700 text-white px-4 py-3 text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-500 pixel-card"
+                className="flex-1 bg-neutral-900 border border-neutral-700 text-white px-4 py-2.5 text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-500 pixel-card"
               />
               <select
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
-                className="bg-neutral-900 border border-neutral-700 text-white px-3 py-3 text-sm focus:outline-none"
+                className="bg-neutral-900 border border-neutral-700 text-white px-3 py-2.5 text-sm focus:outline-none"
               >
                 <option value="km">km</option>
                 <option value="mi">mi</option>
@@ -126,16 +128,16 @@ function LogForm({ workout, elapsedMin, onSubmit }) {
         </>
       )}
 
-      <div className="flex gap-3 mt-4">
+      <div className="flex gap-3 mt-3">
         <button
           onClick={() => onSubmit({ duration: elapsedMin, stars: elapsedMin >= 60 ? 3 : elapsedMin >= 45 ? 2 : 1, calories: null, distance: null, heartRate: null })}
-          className="flex-1 py-4 text-sm text-neutral-500 border border-neutral-800 hover:border-neutral-600 hover:text-neutral-400 pixel-btn-ghost transition-colors"
+          className="flex-1 py-3 text-sm text-neutral-500 border border-neutral-800 hover:border-neutral-600 hover:text-neutral-400 pixel-btn-ghost transition-colors"
         >
           Skip
         </button>
         <button
           onClick={submit}
-          className="flex-2 flex-1 py-4 font-display text-neutral-950 pixel-btn"
+          className="flex-2 flex-1 py-3 font-display text-neutral-950 pixel-btn"
           style={{ background: "var(--accent)", fontSize: "9px", letterSpacing: "0.12em" }}
         >
           SAVE
