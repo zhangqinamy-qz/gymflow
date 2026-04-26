@@ -6,10 +6,11 @@ A workout tracker for logging sessions, discovering workouts, practicing sport d
 
 ## Getting Started
 
-When you first open the app, set up your profile:
-- **Name** — shows on the leaderboard (must be unique within your squad)
-- **Level** — Beginner, Intermediate, or Advanced (affects workout recommendations)
-- **Equipment** — what you have access to (affects which workouts flag as missing gear)
+When you first open the app, a 4-step setup walks you through:
+1. **Name** — shows on the leaderboard (must be unique within your squad)
+2. **Level** — Beginner, Intermediate, or Advanced (affects workout recommendations)
+3. **Equipment** — what you have access to (affects which workouts flag as missing gear)
+4. **Squad code** — if a friend already has a squad, enter their code here to join instantly. Leave blank to skip and join later from the home screen.
 
 ---
 
@@ -64,7 +65,8 @@ Squad members share a real-time leaderboard and their workout history syncs acro
 3. Share the 6-character code with your friends
 
 **To join a squad:**
-1. Home → SQUAD section → enter the code → **JOIN**
+- During setup (step 4) — enter the code when you first create your profile
+- Or later: Home → SQUAD section → enter the code → **JOIN**
 
 **Name rules:** Each name must be unique within a squad. If your name is already taken, you'll need to change it in your profile before joining.
 
