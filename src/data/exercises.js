@@ -7,6 +7,9 @@ export const EQUIPMENT = {
   ROWING_MACHINE: "Rowing Machine",
   LAT_PULLDOWN:  "Lat Pulldown Machine",
   CABLE_MACHINE: "Cable Machine",
+  VOLLEYBALL:    "Volleyball",
+  PICKLEBALL:    "Pickleball",
+  TENNIS_BALL:   "Tennis Ball",
 };
 
 export const MUSCLES = {
@@ -22,6 +25,9 @@ export const MUSCLES = {
   CALVES:      "Calves",
   FOREARMS:    "Forearms",
   HIP_FLEXORS: "Hip Flexors",
+  VOLLEYBALL:  "Volleyball",
+  PICKLEBALL:  "Pickleball",
+  TENNIS:      "Tennis",
 };
 
 export const exercises = [
