@@ -28,7 +28,7 @@ export default function Onboarding({ onComplete, onCancel }) {
         {/* Logo */}
         <div className="mb-10 text-center">
           <h1 className="font-display" style={{ color: "#CCFF47", fontSize: "14px", letterSpacing: "0.3em", lineHeight: "2" }}>
-            GYMFLOW
+            GYMBUDDY
           </h1>
           <p className="text-neutral-600 text-sm mt-1">
             {onCancel ? "Add a new profile" : "Your personal workout guide"}

@@ -223,7 +223,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
         <div>
           <p className="text-neutral-600 font-display" style={{ fontSize: "7px", letterSpacing: "0.15em" }}>{greet()}</p>
           <h1 className="font-display mt-2" style={{ color: "#CCFF47", fontSize: "22px", letterSpacing: "0.2em", lineHeight: "1.4" }}>
-            GYMFLOW
+            GYMBUDDY
           </h1>
         </div>
         <button
