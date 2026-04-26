@@ -189,6 +189,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
   const today = new Date();
   const weekStart = new Date(today);
   weekStart.setDate(today.getDate() - today.getDay());
+  weekStart.setHours(0, 0, 0, 0);
   const sessionsThisWeek = history.filter((h) => new Date(h.date) >= weekStart).length;
   const totalStars = history.reduce((sum, h) => sum + (h.stars || 1), 0);
 
@@ -242,21 +243,21 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2 mb-6">
-        <div className="bg-neutral-900 pixel-card p-4">
+        <Link to="/history" className="bg-neutral-900 pixel-card p-4 hover:bg-neutral-800 transition-colors">
           <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.1em" }}>THIS WEEK</p>
           <p className="font-display mt-2 mb-0.5" style={{ color: "var(--accent)", fontSize: "24px" }}>{sessionsThisWeek}</p>
           <p className="text-neutral-600 text-xs">sessions</p>
-        </div>
-        <div className="bg-neutral-900 pixel-card p-4">
+        </Link>
+        <Link to="/history" className="bg-neutral-900 pixel-card p-4 hover:bg-neutral-800 transition-colors">
           <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.1em" }}>ALL TIME</p>
           <p className="font-display mt-2 mb-0.5" style={{ color: "var(--accent)", fontSize: "24px" }}>{history.length}</p>
           <p className="text-neutral-600 text-xs">sessions</p>
-        </div>
-        <div className="bg-neutral-900 pixel-card p-4">
+        </Link>
+        <Link to="/history" className="bg-neutral-900 pixel-card p-4 hover:bg-neutral-800 transition-colors">
           <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.1em" }}>MY STARS</p>
           <p className="font-display mt-2 mb-0.5" style={{ color: "var(--accent)", fontSize: "24px" }}>{totalStars}</p>
           <p className="text-neutral-600 text-xs">★ earned</p>
-        </div>
+        </Link>
       </div>
 
       {/* Quick actions */}
