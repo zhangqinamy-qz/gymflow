@@ -1,0 +1,355 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { workouts, CATEGORIES } from "../data/workouts";
+import ProfileSwitcher from "../components/ProfileSwitcher";
+
+function SquadSection({ profile, activeId, squadLeaderboard, onCreateSquad, onJoinSquad, onLeaveSquad }) {
+  const [joinCode, setJoinCode]   = useState("");
+  const [joining,  setJoining]    = useState(false);
+  const [creating, setCreating]   = useState(false);
+  const [error,    setError]      = useState("");
+  const [copied,   setCopied]     = useState(false);
+
+  const inSquad = !!profile?.squadId;
+
+  const handleJoin = async () => {
+    if (!joinCode.trim()) return;
+    setJoining(true);
+    setError("");
+    try { await onJoinSquad(joinCode); setJoinCode(""); }
+    catch (e) { setError(e.message); }
+    finally { setJoining(false); }
+  };
+
+  const handleCreate = async () => {
+    setCreating(true);
+    setError("");
+    try { await onCreateSquad(); }
+    catch (e) { setError(e.message || "Failed to create squad"); }
+    finally { setCreating(false); }
+  };
+
+  const copyCode = () => {
+    navigator.clipboard?.writeText(profile.squadId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (!inSquad) {
+    return (
+      <div className="mb-8">
+        <h2 className="font-display text-white mb-3" style={{ fontSize: "9px", letterSpacing: "0.12em" }}>SQUAD</h2>
+        <div className="bg-neutral-900 pixel-card p-4">
+          <p className="text-neutral-500 text-sm mb-4">Compete with friends on a shared leaderboard.</p>
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              placeholder="Enter squad code"
+              value={joinCode}
+              onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+              onKeyDown={(e) => e.key === "Enter" && handleJoin()}
+              className="flex-1 bg-neutral-800 border border-neutral-700 text-white px-3 py-2 text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-500"
+              maxLength={8}
+            />
+            <button
+              onClick={handleJoin}
+              disabled={joining || !joinCode.trim()}
+              className="px-4 py-2 font-display text-neutral-950 pixel-btn disabled:opacity-40"
+              style={{ background: "#CCFF47", fontSize: "8px", letterSpacing: "0.1em" }}
+            >
+              {joining ? "..." : "JOIN"}
+            </button>
+          </div>
+          {error && <p className="text-red-400 text-xs mb-2">{error}</p>}
+          <div className="flex items-center gap-3 my-3">
+            <div className="h-px flex-1 bg-neutral-800" />
+            <span className="text-neutral-700 text-xs">or</span>
+            <div className="h-px flex-1 bg-neutral-800" />
+          </div>
+          <button
+            onClick={handleCreate}
+            disabled={creating}
+            className="w-full py-2.5 font-display text-neutral-500 border border-neutral-700 hover:border-neutral-500 hover:text-neutral-300 transition-colors disabled:opacity-40"
+            style={{ fontSize: "7px", letterSpacing: "0.12em" }}
+          >
+            {creating ? "CREATING..." : "+ CREATE NEW SQUAD"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="font-display text-white" style={{ fontSize: "9px", letterSpacing: "0.12em" }}>SQUAD</h2>
+        <button
+          onClick={onLeaveSquad}
+          className="font-display text-neutral-700 hover:text-red-500 transition-colors"
+          style={{ fontSize: "6px", letterSpacing: "0.1em" }}
+        >
+          LEAVE
+        </button>
+      </div>
+
+      <div className="bg-neutral-900 pixel-card p-4 mb-3 flex items-center justify-between">
+        <div>
+          <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.12em" }}>SQUAD CODE — share with friends</p>
+          <p className="font-display text-white mt-1" style={{ fontSize: "22px", letterSpacing: "0.3em" }}>{profile.squadId}</p>
+        </div>
+        <button
+          onClick={copyCode}
+          className="font-display px-3 py-1.5 border border-neutral-700 text-neutral-400 hover:border-neutral-500 transition-colors"
+          style={{ fontSize: "6px", letterSpacing: "0.1em" }}
+        >
+          {copied ? "COPIED!" : "COPY"}
+        </button>
+      </div>
+
+      {squadLeaderboard.length > 0 ? (
+        <div className="bg-neutral-900 pixel-card overflow-hidden">
+          {squadLeaderboard.map((m, i) => {
+            const isMe = m.id === activeId;
+            const rankColor = RANK_COLORS[i] || "#555";
+            return (
+              <div key={m.id} className={`flex items-center gap-3 px-4 py-3 border-b border-neutral-800 last:border-b-0 ${isMe ? "bg-neutral-800/60" : ""}`}>
+                <span className="font-display w-6 flex-shrink-0" style={{ fontSize: "8px", color: rankColor }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center border" style={{ borderColor: rankColor, background: `${rankColor}18` }}>
+                  <span className="font-display" style={{ fontSize: "7px", color: rankColor }}>{m.name[0]?.toUpperCase()}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-sm font-medium truncate">
+                    {m.name}{isMe && <span className="text-neutral-600 text-xs ml-1">(you)</span>}
+                  </p>
+                  <p className="text-neutral-600 text-xs">{m.sessions} session{m.sessions !== 1 ? "s" : ""}</p>
+                </div>
+                <div className="flex-shrink-0 text-right">
+                  <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>{m.stars}</p>
+                  <p className="text-neutral-600" style={{ fontSize: "9px" }}>★ stars</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-neutral-600 text-sm text-center py-3">
+          No sessions yet — log a workout to appear here!
+        </p>
+      )}
+    </div>
+  );
+}
+
+const catColor = {
+  [CATEGORIES.RUNNING]:  "text-orange-400",
+  [CATEGORIES.BALL]:     "text-sky-400",
+  [CATEGORIES.STRENGTH]: "text-lime-400",
+};
+
+const RANK_COLORS = ["#CCFF47", "#aaaaaa", "#cd7f32"];
+const RANK_LABELS = ["01", "02", "03", "04", "05"];
+
+function Stars({ count, size = "sm" }) {
+  const px = size === "lg" ? "14px" : "10px";
+  return (
+    <span style={{ color: "#CCFF47", fontSize: px, letterSpacing: "2px" }}>
+      {"★".repeat(count)}{"☆".repeat(3 - count)}
+    </span>
+  );
+}
+
+function WorkoutCard({ workout }) {
+  return (
+    <Link
+      to={`/workout/${workout.id}`}
+      className="block bg-neutral-900 pixel-card p-4 hover:bg-neutral-800 transition-colors active:scale-95"
+    >
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex-1">
+          <span className={`text-xs uppercase tracking-wider font-display ${catColor[workout.category] || "text-neutral-400"}`} style={{ fontSize: "7px" }}>
+            {workout.subcategory || workout.category}
+          </span>
+          <h3 className="text-white font-semibold text-base mt-1">{workout.title}</h3>
+        </div>
+        <span className="text-neutral-500 text-xs ml-2 flex-shrink-0">{workout.duration}m</span>
+      </div>
+      <p className="text-neutral-500 text-sm leading-relaxed line-clamp-2">{workout.description}</p>
+      <div className="flex gap-2 mt-3">
+        <span className="text-xs px-2 py-0.5 bg-neutral-800 text-neutral-500 border border-neutral-700">{workout.difficulty}</span>
+      </div>
+    </Link>
+  );
+}
+
+export default function Home({ profile, profiles, activeId, history, leaderboard = [], onSwitch, onAddProfile, onDeleteProfile, squadLeaderboard = [], supabaseEnabled = false, onCreateSquad, onJoinSquad, onLeaveSquad }) {
+  const [showSwitcher, setShowSwitcher] = useState(false);
+
+  const today = new Date();
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - today.getDay());
+  const sessionsThisWeek = history.filter((h) => new Date(h.date) >= weekStart).length;
+  const totalStars = history.reduce((sum, h) => sum + (h.stars || 1), 0);
+
+  const greet = () => {
+    const h = today.getHours();
+    if (h < 12) return "GOOD MORNING";
+    if (h < 17) return "GOOD AFTERNOON";
+    return "GOOD EVENING";
+  };
+
+  const featured = [CATEGORIES.RUNNING, CATEGORIES.BALL, CATEGORIES.STRENGTH].map(
+    (cat) =>
+      workouts.find((w) => w.category === cat && w.difficulty === profile?.level) ||
+      workouts.find((w) => w.category === cat)
+  );
+
+  return (
+    <div className="max-w-2xl mx-auto px-4 pt-10 pb-6">
+      {showSwitcher && (
+        <ProfileSwitcher
+          profiles={profiles}
+          activeId={activeId}
+          onSwitch={onSwitch}
+          onAddProfile={onAddProfile}
+          onDeleteProfile={onDeleteProfile}
+          onClose={() => setShowSwitcher(false)}
+        />
+      )}
+
+      {/* Header */}
+      <div className="flex items-start justify-between mb-8">
+        <div>
+          <p className="text-neutral-600 font-display" style={{ fontSize: "7px", letterSpacing: "0.15em" }}>{greet()}</p>
+          <h1 className="font-display mt-2" style={{ color: "#CCFF47", fontSize: "22px", letterSpacing: "0.2em", lineHeight: "1.4" }}>
+            GYMFLOW
+          </h1>
+        </div>
+        <button
+          onClick={() => setShowSwitcher(true)}
+          className="flex items-center gap-2 bg-neutral-900 border border-neutral-700 px-3 py-2 pixel-card hover:border-neutral-500 transition-colors"
+        >
+          <div className="w-5 h-5 bg-lime-400/20 border border-lime-400/40 flex items-center justify-center">
+            <span className="text-lime-400 font-display" style={{ fontSize: "6px" }}>
+              {profile?.name?.[0]?.toUpperCase() || "?"}
+            </span>
+          </div>
+          <span className="text-white text-xs font-medium">{profile?.name || "Select"}</span>
+          <span className="text-neutral-600 text-xs">▾</span>
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-2 mb-6">
+        <div className="bg-neutral-900 pixel-card p-4">
+          <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.1em" }}>THIS WEEK</p>
+          <p className="font-display mt-2 mb-0.5" style={{ color: "#CCFF47", fontSize: "24px" }}>{sessionsThisWeek}</p>
+          <p className="text-neutral-600 text-xs">sessions</p>
+        </div>
+        <div className="bg-neutral-900 pixel-card p-4">
+          <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.1em" }}>ALL TIME</p>
+          <p className="font-display mt-2 mb-0.5" style={{ color: "#CCFF47", fontSize: "24px" }}>{history.length}</p>
+          <p className="text-neutral-600 text-xs">sessions</p>
+        </div>
+        <div className="bg-neutral-900 pixel-card p-4">
+          <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.1em" }}>MY STARS</p>
+          <p className="font-display mt-2 mb-0.5" style={{ color: "#CCFF47", fontSize: "24px" }}>{totalStars}</p>
+          <p className="text-neutral-600 text-xs">★ earned</p>
+        </div>
+      </div>
+
+      {/* Quick actions */}
+      <div className="grid grid-cols-2 gap-2 mb-8">
+        <Link
+          to="/browse"
+          className="flex items-center justify-center gap-2 py-3 bg-neutral-900 border border-neutral-700 pixel-card hover:border-neutral-500 transition-colors"
+        >
+          <span className="font-display text-neutral-400" style={{ fontSize: "8px", letterSpacing: "0.12em" }}>BROWSE</span>
+        </Link>
+        <Link
+          to="/create"
+          className="flex items-center justify-center gap-2 py-3 pixel-btn font-display text-neutral-950 transition-colors"
+          style={{ background: "#CCFF47", fontSize: "8px", letterSpacing: "0.12em" }}
+        >
+          + CREATE
+        </Link>
+      </div>
+
+      {/* Squad */}
+      {supabaseEnabled && (
+        <SquadSection
+          profile={profile}
+          activeId={activeId}
+          squadLeaderboard={squadLeaderboard}
+          onCreateSquad={onCreateSquad}
+          onJoinSquad={onJoinSquad}
+          onLeaveSquad={onLeaveSquad}
+        />
+      )}
+
+      {/* Leaderboard */}
+      {leaderboard.length > 1 && (
+        <div className="mb-8">
+          <h2 className="font-display text-white mb-3" style={{ fontSize: "9px", letterSpacing: "0.12em" }}>
+            LEADERBOARD
+          </h2>
+          <div className="bg-neutral-900 pixel-card overflow-hidden">
+            {leaderboard.map((p, i) => {
+              const isActive = p.id === activeId;
+              const rankColor = RANK_COLORS[i] || "#555";
+              return (
+                <div
+                  key={p.id}
+                  className={`flex items-center gap-3 px-4 py-3 border-b border-neutral-800 last:border-b-0 ${isActive ? "bg-neutral-800/60" : ""}`}
+                >
+                  {/* Rank */}
+                  <span className="font-display w-6 flex-shrink-0" style={{ fontSize: "8px", color: rankColor }}>
+                    {RANK_LABELS[i]}
+                  </span>
+
+                  {/* Avatar */}
+                  <div
+                    className="w-7 h-7 flex-shrink-0 flex items-center justify-center border"
+                    style={{ borderColor: rankColor, background: `${rankColor}18` }}
+                  >
+                    <span className="font-display" style={{ fontSize: "7px", color: rankColor }}>
+                      {p.name[0]?.toUpperCase()}
+                    </span>
+                  </div>
+
+                  {/* Name + sessions */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-medium truncate">
+                      {p.name}
+                      {isActive && <span className="text-neutral-600 text-xs ml-1">(you)</span>}
+                    </p>
+                    <p className="text-neutral-600 text-xs">{p.sessions} session{p.sessions !== 1 ? "s" : ""}</p>
+                  </div>
+
+                  {/* Stars */}
+                  <div className="flex-shrink-0 text-right">
+                    <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>{p.stars}</p>
+                    <p className="text-neutral-600" style={{ fontSize: "9px" }}>★ stars</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-neutral-700 text-xs mt-2 text-center">
+            1★ per session · 3★ for 60+ min workouts
+          </p>
+        </div>
+      )}
+
+      {/* Recommended */}
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="font-display text-white" style={{ fontSize: "9px", letterSpacing: "0.12em" }}>RECOMMENDED</h2>
+        <Link to="/browse" className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors">See all →</Link>
+      </div>
+      <div className="flex flex-col gap-3">
+        {featured.map((w) => w && <WorkoutCard key={w.id} workout={w} />)}
+      </div>
+    </div>
+  );
+}
