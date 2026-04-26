@@ -49,7 +49,7 @@ export default function ExercisePicker({ onPick, onClose, customExercises = [] }
                 <span className="text-white text-sm">{ex.name}</span>
               </div>
               <span className="block text-xs text-neutral-600 mt-0.5">
-                {ex.difficulty} Â· {ex.primary?.join(", ")}
+                {ex.difficulty} · {ex.primary?.join(", ")}
               </span>
             </button>
           ))}

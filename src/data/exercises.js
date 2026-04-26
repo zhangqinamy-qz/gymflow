@@ -104,7 +104,7 @@ export const exercises = [
     equipment: [EQUIPMENT.PULL_UP_BAR],
     primary: [MUSCLES.BACK, MUSCLES.BICEPS],
     secondary: [MUSCLES.CORE, MUSCLES.FOREARMS],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=KOaCM1HMwU0",
     modification: "Bend knees for easier angle",
   },
   {
@@ -114,7 +114,7 @@ export const exercises = [
     equipment: [EQUIPMENT.LAT_PULLDOWN],
     primary: [MUSCLES.BACK, MUSCLES.BICEPS],
     secondary: [MUSCLES.SHOULDERS, MUSCLES.FOREARMS],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=SALxEARiMkw&t=1s",
     modification: "Use lighter weight, full range of motion",
   },
   {
@@ -124,7 +124,7 @@ export const exercises = [
     equipment: [EQUIPMENT.CABLE_MACHINE],
     primary: [MUSCLES.SHOULDERS, MUSCLES.BACK],
     secondary: [MUSCLES.BICEPS],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=V8dZ3pyiCBo",
     modification: "Use lighter weight, pull to nose level",
   },
   {

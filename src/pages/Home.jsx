@@ -94,7 +94,7 @@ function SquadSection({ profile, activeId, squadLeaderboard, onCreateSquad, onJo
 
       <div className="bg-neutral-900 pixel-card p-4 mb-3 flex items-center justify-between">
         <div>
-          <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.12em" }}>SQUAD CODE â€” share with friends</p>
+          <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.12em" }}>SQUAD CODE — share with friends</p>
           <p className="font-display text-white mt-1" style={{ fontSize: "22px", letterSpacing: "0.3em" }}>{profile.squadId}</p>
         </div>
         <button
@@ -127,7 +127,7 @@ function SquadSection({ profile, activeId, squadLeaderboard, onCreateSquad, onJo
                 </div>
                 <div className="flex-shrink-0 text-right">
                   <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>{m.stars}</p>
-                  <p className="text-neutral-600" style={{ fontSize: "9px" }}>â˜… stars</p>
+                  <p className="text-neutral-600" style={{ fontSize: "9px" }}>★ stars</p>
                 </div>
               </div>
             );
@@ -135,7 +135,7 @@ function SquadSection({ profile, activeId, squadLeaderboard, onCreateSquad, onJo
         </div>
       ) : (
         <p className="text-neutral-600 text-sm text-center py-3">
-          No sessions yet â€” log a workout to appear here!
+          No sessions yet — log a workout to appear here!
         </p>
       )}
     </div>
@@ -155,7 +155,7 @@ function Stars({ count, size = "sm" }) {
   const px = size === "lg" ? "14px" : "10px";
   return (
     <span style={{ color: "var(--accent)", fontSize: px, letterSpacing: "2px" }}>
-      {"â˜…".repeat(count)}{"â˜†".repeat(3 - count)}
+      {"★".repeat(count)}{"☆".repeat(3 - count)}
     </span>
   );
 }
@@ -236,7 +236,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
             </span>
           </div>
           <span className="text-white text-xs font-medium">{profile?.name || "Select"}</span>
-          <span className="text-neutral-600 text-xs">â–¾</span>
+          <span className="text-neutral-600 text-xs">▾</span>
         </button>
       </div>
 
@@ -255,7 +255,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
         <div className="bg-neutral-900 pixel-card p-4">
           <p className="font-display text-neutral-600" style={{ fontSize: "6px", letterSpacing: "0.1em" }}>MY STARS</p>
           <p className="font-display mt-2 mb-0.5" style={{ color: "var(--accent)", fontSize: "24px" }}>{totalStars}</p>
-          <p className="text-neutral-600 text-xs">â˜… earned</p>
+          <p className="text-neutral-600 text-xs">★ earned</p>
         </div>
       </div>
 
@@ -328,14 +328,14 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
                   {/* Stars */}
                   <div className="flex-shrink-0 text-right">
                     <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>{p.stars}</p>
-                    <p className="text-neutral-600" style={{ fontSize: "9px" }}>â˜… stars</p>
+                    <p className="text-neutral-600" style={{ fontSize: "9px" }}>★ stars</p>
                   </div>
                 </div>
               );
             })}
           </div>
           <p className="text-neutral-700 text-xs mt-2 text-center">
-            1â˜… per session Â· 3â˜… for 60+ min workouts
+            1★ per session · 3★ for 60+ min workouts
           </p>
         </div>
       )}
@@ -343,7 +343,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
       {/* Recommended */}
       <div className="flex items-center justify-between mb-3">
         <h2 className="font-display text-white" style={{ fontSize: "9px", letterSpacing: "0.12em" }}>RECOMMENDED</h2>
-        <Link to="/browse" className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors">See all â†’</Link>
+        <Link to="/browse" className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors">See all →</Link>
       </div>
       <div className="flex flex-col gap-3">
         {featured.map((w) => w && <WorkoutCard key={w.id} workout={w} />)}

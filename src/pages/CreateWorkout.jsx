@@ -9,7 +9,7 @@ const ALL_MUSCLES = Object.values(MUSCLES);
 const ALL_EQUIPMENT = Object.values(EQUIPMENT);
 const DIFFICULTIES = ["Beginner", "Intermediate", "Advanced"];
 
-// â”€â”€â”€ Warm-up / Cool-down recommendation logic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Warm-up / Cool-down recommendation logic ─────────────────────────────────
 
 const UPPER_MUSCLES = ["Chest", "Shoulders", "Biceps", "Triceps", "Back", "Forearms"];
 const LOWER_MUSCLES = ["Quads", "Hamstrings", "Glutes", "Hip Flexors", "Calves"];
@@ -76,7 +76,7 @@ function generatePhases(mainItems, allExById) {
   return { warmup, cooldown };
 }
 
-// â”€â”€â”€ Exercise Creator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Exercise Creator ─────────────────────────────────────────────────────────
 
 function MusclePicker({ label, selected, onChange, exclude = [] }) {
   const toggle = (m) =>
@@ -142,7 +142,7 @@ function CreateExercise({ onSave, customExercises }) {
     <div>
       {saved && (
         <div className="mb-4 py-2 px-4 border border-lime-400 bg-lime-400/10 text-lime-400 text-xs font-display" style={{ fontSize: "7px", letterSpacing: "0.1em" }}>
-          EXERCISE SAVED â˜…
+          EXERCISE SAVED ★
         </div>
       )}
       <div className="mb-4">
@@ -201,7 +201,7 @@ function CreateExercise({ onSave, customExercises }) {
             {customExercises.map((ex) => (
               <div key={ex.id} className="bg-neutral-900 pixel-card p-3 text-sm">
                 <p className="text-white font-medium">{ex.name}</p>
-                <p className="text-neutral-600 text-xs mt-0.5">{ex.difficulty} Â· {ex.primary.join(", ")}</p>
+                <p className="text-neutral-600 text-xs mt-0.5">{ex.difficulty} · {ex.primary.join(", ")}</p>
               </div>
             ))}
           </div>
@@ -211,7 +211,7 @@ function CreateExercise({ onSave, customExercises }) {
   );
 }
 
-// â”€â”€â”€ Rows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Rows ─────────────────────────────────────────────────────────────────────
 
 function ExerciseRow({ item, index, onChange, onRemove }) {
   return (
@@ -219,7 +219,7 @@ function ExerciseRow({ item, index, onChange, onRemove }) {
       <div className="flex items-center gap-2 mb-2">
         <span className="text-neutral-600 text-xs w-5">{index + 1}.</span>
         <span className="text-white text-sm font-medium flex-1">{item.name}</span>
-        <button onClick={onRemove} className="text-neutral-600 hover:text-red-400 px-1">âœ•</button>
+        <button onClick={onRemove} className="text-neutral-600 hover:text-red-400 px-1">✕</button>
       </div>
       <div className="flex gap-2 pl-7">
         <div className="flex flex-col gap-0.5">
@@ -246,7 +246,7 @@ function PhaseRow({ item, index, onRemove, allExById }) {
     ? (allExById[item.exerciseId]?.name || item.exerciseId)
     : (item.name || "Exercise");
   const detail = item.sets
-    ? `${item.sets} Ã— ${item.reps || item.duration}`
+    ? `${item.sets} × ${item.reps || item.duration}`
     : item.reps || item.duration || "";
   return (
     <div className="pixel-card bg-neutral-900 p-3 mb-2 flex items-center gap-2">
@@ -255,12 +255,12 @@ function PhaseRow({ item, index, onRemove, allExById }) {
         <p className="text-white text-sm">{name}</p>
         {detail && <p className="text-neutral-600 text-xs mt-0.5">{detail}</p>}
       </div>
-      <button onClick={onRemove} className="text-neutral-600 hover:text-red-400 px-1 text-sm">âœ•</button>
+      <button onClick={onRemove} className="text-neutral-600 hover:text-red-400 px-1 text-sm">✕</button>
     </div>
   );
 }
 
-// â”€â”€â”€ Main component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Main component ───────────────────────────────────────────────────────────
 
 export default function CreateWorkout({ onSaveWorkout, onSaveExercise, customExercises = [] }) {
   const navigate = useNavigate();
@@ -345,7 +345,7 @@ export default function CreateWorkout({ onSaveWorkout, onSaveExercise, customExe
       )}
 
       <button onClick={() => navigate(-1)} className="text-neutral-500 hover:text-neutral-300 text-sm mb-6 transition-colors">
-        â† Back
+        ← Back
       </button>
 
       <h1 className="font-display text-white mb-6" style={{ fontSize: "14px", letterSpacing: "0.2em", lineHeight: "1.5" }}>
@@ -392,7 +392,7 @@ export default function CreateWorkout({ onSaveWorkout, onSaveExercise, customExe
             </div>
           </div>
 
-          {/* â”€â”€ Warm-up â”€â”€ */}
+          {/* ── Warm-up ── */}
           {phaseSeparator("WARM-UP", "#fb923c")}
           {warmupItems.length === 0 ? (
             <p className="text-neutral-700 text-xs text-center py-3 mb-2">
@@ -411,7 +411,7 @@ export default function CreateWorkout({ onSaveWorkout, onSaveExercise, customExe
             + ADD TO WARM-UP
           </button>
 
-          {/* â”€â”€ Main exercises â”€â”€ */}
+          {/* ── Main exercises ── */}
           {phaseSeparator("MAIN WORKOUT", "var(--accent)")}
           {items.length === 0 && (
             <div className="text-center py-8 border border-dashed border-neutral-800 text-neutral-600 text-sm mb-3">
@@ -442,11 +442,11 @@ export default function CreateWorkout({ onSaveWorkout, onSaveExercise, customExe
                 color: generated ? "#6ea825" : "#737373",
               }}
             >
-              {generated ? "âœ“ WARM-UP & COOL-DOWN GENERATED â€” REGENERATE?" : "âœ¦ AUTO-GENERATE WARM-UP & COOL-DOWN"}
+              {generated ? "✓ WARM-UP & COOL-DOWN GENERATED — REGENERATE?" : "✦ AUTO-GENERATE WARM-UP & COOL-DOWN"}
             </button>
           )}
 
-          {/* â”€â”€ Cool-down â”€â”€ */}
+          {/* ── Cool-down ── */}
           {phaseSeparator("COOL-DOWN", "#38bdf8")}
           {cooldownItems.length === 0 ? (
             <p className="text-neutral-700 text-xs text-center py-3 mb-2">

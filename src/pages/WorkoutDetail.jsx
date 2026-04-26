@@ -5,17 +5,17 @@ import { exerciseById } from "../data/exercises";
 import BodyMap from "../components/BodyMap";
 import ExercisePicker from "../components/ExercisePicker";
 
-// â”€â”€â”€ Add-item detail prompt â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Add-item detail prompt ───────────────────────────────────────────────────
 
 function AddItemPrompt({ item, phase, onConfirm, onCancel }) {
   const [detail, setDetail] = useState(
-    phase === "main" ? "3 Ã— 10" : "30 sec"
+    phase === "main" ? "3 × 10" : "30 sec"
   );
 
   const confirm = () => {
     const newItem = { exerciseId: item.exerciseId || null, name: item.name };
     const trimmed = detail.trim();
-    const crossMatch = trimmed.match(/^(\d+)\s*[Ã—x]\s*(.+)$/i);
+    const crossMatch = trimmed.match(/^(\d+)\s*[×x]\s*(.+)$/i);
     if (crossMatch) {
       newItem.sets = parseInt(crossMatch[1]);
       newItem.reps = crossMatch[2].trim();
@@ -34,7 +34,7 @@ function AddItemPrompt({ item, phase, onConfirm, onCancel }) {
         </p>
         <p className="text-neutral-400 text-sm mb-4">{item.name}</p>
         <label className="block font-display text-neutral-500 mb-2" style={{ fontSize: "7px", letterSpacing: "0.1em" }}>
-          SETS Ã— REPS OR DURATION
+          SETS × REPS OR DURATION
         </label>
         <input
           autoFocus
@@ -42,7 +42,7 @@ function AddItemPrompt({ item, phase, onConfirm, onCancel }) {
           value={detail}
           onChange={(e) => setDetail(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && confirm()}
-          placeholder="e.g. 3 Ã— 10  or  45 sec"
+          placeholder="e.g. 3 × 10  or  45 sec"
           className="w-full bg-neutral-900 border border-neutral-700 text-white px-3 py-2.5 text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-500 mb-4"
         />
         <div className="flex gap-3">
@@ -62,13 +62,13 @@ function AddItemPrompt({ item, phase, onConfirm, onCancel }) {
   );
 }
 
-// â”€â”€â”€ Exercise item (view + edit mode) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Exercise item (view + edit mode) ────────────────────────────────────────
 
 function ExerciseItem({ item, allExercisesById, disliked = [], onToggleDislike, editing, onRemove }) {
   const ex = item.exerciseId ? (allExercisesById?.[item.exerciseId] ?? exerciseById[item.exerciseId]) : null;
   const name = ex?.name || item.name || "Exercise";
   const detail = item.sets
-    ? `${item.sets} Ã— ${item.reps || item.duration}`
+    ? `${item.sets} × ${item.reps || item.duration}`
     : item.reps || item.duration || "";
   const isDisliked = item.exerciseId && disliked.includes(item.exerciseId);
 
@@ -98,7 +98,7 @@ function ExerciseItem({ item, allExercisesById, disliked = [], onToggleDislike, 
               className="w-7 h-7 flex items-center justify-center border border-red-900 bg-red-950 text-red-400 hover:bg-red-900 transition-colors text-sm"
               title="Remove exercise"
             >
-              âœ•
+              ✕
             </button>
           ) : (
             <>
@@ -126,7 +126,7 @@ function ExerciseItem({ item, allExercisesById, disliked = [], onToggleDislike, 
                       : "border-neutral-700 text-neutral-600 hover:border-orange-700 hover:text-orange-500"
                   }`}
                 >
-                  ðŸ‘Ž
+                  👎
                 </button>
               )}
             </>
@@ -150,7 +150,7 @@ function ExerciseItem({ item, allExercisesById, disliked = [], onToggleDislike, 
   );
 }
 
-// â”€â”€â”€ Phase section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Phase section ────────────────────────────────────────────────────────────
 
 function Phase({ title, items, accentColor, allExercisesById, disliked, onToggleDislike, editing, onRemove, onAddClick }) {
   if (!editing && (!items || items.length === 0)) return null;
@@ -187,7 +187,7 @@ function Phase({ title, items, accentColor, allExercisesById, disliked, onToggle
   );
 }
 
-// â”€â”€â”€ Main component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Main component ───────────────────────────────────────────────────────────
 
 export default function WorkoutDetail({
   profile,
@@ -217,7 +217,7 @@ export default function WorkoutDetail({
 
   if (!workout) return (
     <div className="flex items-center justify-center min-h-screen text-neutral-500 text-sm">
-      Not found. <Link to="/browse" className="ml-2 text-lime-400">Browse â†’</Link>
+      Not found. <Link to="/browse" className="ml-2 text-lime-400">Browse →</Link>
     </div>
   );
 
@@ -295,7 +295,7 @@ export default function WorkoutDetail({
       )}
 
       <button onClick={() => navigate(-1)} className="text-neutral-500 hover:text-neutral-300 text-sm mb-6 transition-colors">
-        â† Back
+        ← Back
       </button>
 
       {/* Header */}
@@ -336,17 +336,17 @@ export default function WorkoutDetail({
         </div>
         <div className="flex items-center gap-3 mt-2 text-sm text-neutral-500">
           <span>{workout.duration} min</span>
-          <span className="text-neutral-700">Â·</span>
+          <span className="text-neutral-700">·</span>
           <span>{workout.difficulty}</span>
           {hasOverride && isPreset && (
             <>
-              <span className="text-neutral-700">Â·</span>
+              <span className="text-neutral-700">·</span>
               <span className="font-display text-lime-400" style={{ fontSize: "7px" }}>EDITED</span>
             </>
           )}
           {!gearOk && (
             <>
-              <span className="text-neutral-700">Â·</span>
+              <span className="text-neutral-700">·</span>
               <span className="text-orange-400 text-xs">Missing equipment</span>
             </>
           )}

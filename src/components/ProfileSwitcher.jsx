@@ -49,7 +49,7 @@ export default function ProfileSwitcher({ profiles, activeId, onSwitch, onAddPro
                     onClick={() => setConfirmDelete(null)}
                     className="px-3 text-xs border border-neutral-700 text-neutral-500 hover:border-neutral-500 transition-colors"
                   >
-                    âœ•
+                    ✕
                   </button>
                 </div>
               ) : (
@@ -58,7 +58,7 @@ export default function ProfileSwitcher({ profiles, activeId, onSwitch, onAddPro
                   className="px-3 border border-neutral-800 text-neutral-700 hover:border-red-800 hover:text-red-500 transition-colors text-xs"
                   title="Delete profile"
                 >
-                  ðŸ—‘
+                  🗑
                 </button>
               )}
             </div>

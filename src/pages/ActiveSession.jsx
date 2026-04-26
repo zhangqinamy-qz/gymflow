@@ -72,7 +72,7 @@ function LogForm({ workout, elapsedMin, onSubmit }) {
   return (
     <div className="min-h-screen bg-neutral-950 flex flex-col px-4 pt-8 max-w-md mx-auto">
       <div className="mb-6">
-        <p className="font-display mb-2" style={{ color: "var(--accent)", fontSize: "22px" }}>â˜…</p>
+        <p className="font-display mb-2" style={{ color: "var(--accent)", fontSize: "22px" }}>★</p>
         <h2 className="font-display text-white mb-1" style={{ fontSize: "14px", letterSpacing: "0.15em", lineHeight: "1.5" }}>
           LOG SESSION
         </h2>
@@ -184,13 +184,13 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
     return (
       <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center px-6 text-center">
         <p className="font-display mb-2" style={{ fontSize: "40px", color: "var(--accent)", letterSpacing: "6px" }}>
-          {"â˜…".repeat(starsEarned)}{"â˜†".repeat(3 - starsEarned)}
+          {"★".repeat(starsEarned)}{"☆".repeat(3 - starsEarned)}
         </p>
         <h1 className="font-display text-white mb-1" style={{ fontSize: "20px", letterSpacing: "0.2em", color: "var(--accent)" }}>
           {starsEarned === 3 ? "LEGENDARY!" : "DONE!"}
         </h1>
         <p className="font-display text-neutral-500 mb-1" style={{ fontSize: "8px" }}>
-          {starsEarned === 3 ? "+3 STARS â€” OVER 60 MIN!" : "+1 STAR"}
+          {starsEarned === 3 ? "+3 STARS — OVER 60 MIN!" : "+1 STAR"}
         </p>
         <p className="text-neutral-600 text-sm mt-2">{workout.title}</p>
         {loggedData && (
@@ -198,7 +198,7 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
             <span>{loggedData.duration}m</span>
             {loggedData.calories && <span>{loggedData.calories} cal</span>}
             {loggedData.distance && <span>{loggedData.distance} {loggedData.distanceUnit}</span>}
-            {loggedData.heartRate && <span>â™¥ {loggedData.heartRate} bpm</span>}
+            {loggedData.heartRate && <span>♥ {loggedData.heartRate} bpm</span>}
           </div>
         )}
         <button
@@ -241,7 +241,7 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
   const phaseColor = phaseColors[step?.phase] || "var(--accent)";
 
   const detail = step?.sets
-    ? `${step.sets} Ã— ${step.reps || step.duration}`
+    ? `${step.sets} × ${step.reps || step.duration}`
     : step?.reps || step?.duration || "";
 
   const advance = () => {
@@ -262,7 +262,7 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
       {/* Top bar */}
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
         <button onClick={() => navigate(-1)} className="text-neutral-600 hover:text-neutral-400 text-sm transition-colors">
-          âœ• Quit
+          ✕ Quit
         </button>
         <span className="font-display text-neutral-600" style={{ fontSize: "7px" }}>
           {current + 1} / {steps.length}
@@ -296,7 +296,7 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
                 : "border-neutral-800 text-neutral-600 hover:border-orange-800 hover:text-orange-600"
             }`}
           >
-            ðŸ‘Ž {(profile?.dislikedExercises || []).includes(step.exerciseId) ? "Remove from excluded" : "Exclude from my recommendations"}
+            👎 {(profile?.dislikedExercises || []).includes(step.exerciseId) ? "Remove from excluded" : "Exclude from my recommendations"}
           </button>
         )}
 
@@ -336,7 +336,7 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
               onClick={() => setCurrent((c) => c - 1)}
               className="flex-1 py-4 text-sm font-medium text-neutral-300 border border-neutral-700 pixel-btn-ghost"
             >
-              â† Back
+              ← Back
             </button>
           )}
           <button
@@ -344,7 +344,7 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
             className="flex-1 py-4 font-display text-neutral-950 pixel-btn"
             style={{ background: "var(--accent)", fontSize: "9px", letterSpacing: "0.15em" }}
           >
-            {isLast ? "FINISH â˜…" : "NEXT â†’"}
+            {isLast ? "FINISH ★" : "NEXT →"}
           </button>
         </div>
       </div>

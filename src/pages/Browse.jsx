@@ -110,7 +110,7 @@ export default function Browse({ profile, customWorkouts = [], onDeleteCustom })
                   onClick={(e) => { e.preventDefault(); onDeleteCustom(w.id); }}
                   className="absolute top-3 right-10 opacity-0 group-hover:opacity-100 text-neutral-600 hover:text-red-400 text-xs transition-all px-1"
                 >
-                  âœ•
+                  ✕
                 </button>
               )}
             </div>

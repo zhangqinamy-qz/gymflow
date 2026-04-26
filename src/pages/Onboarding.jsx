@@ -56,7 +56,7 @@ export default function Onboarding({ onComplete, onCancel }) {
               className="w-full py-4 font-semibold text-neutral-950 disabled:opacity-40 pixel-btn transition-all"
               style={{ background: "var(--accent)" }}
             >
-              Next â†’
+              Next →
             </button>
             {onCancel && (
               <button onClick={onCancel} className="w-full py-3 mt-2 text-sm text-neutral-600 hover:text-neutral-400 transition-colors">
@@ -88,10 +88,10 @@ export default function Onboarding({ onComplete, onCancel }) {
             </div>
             <div className="flex gap-3">
               <button onClick={() => setStep(0)} className="flex-1 py-4 border border-neutral-700 text-neutral-300 text-sm font-medium pixel-btn-ghost">
-                â† Back
+                ← Back
               </button>
               <button onClick={() => setStep(2)} className="flex-1 py-4 font-semibold text-neutral-950 pixel-btn" style={{ background: "var(--accent)" }}>
-                Next â†’
+                Next →
               </button>
             </div>
           </div>
@@ -119,7 +119,7 @@ export default function Onboarding({ onComplete, onCancel }) {
             </div>
             <div className="flex gap-3">
               <button onClick={() => setStep(1)} className="flex-1 py-4 border border-neutral-700 text-neutral-300 text-sm font-medium pixel-btn-ghost">
-                â† Back
+                ← Back
               </button>
               <button
                 onClick={finish}
