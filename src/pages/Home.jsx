@@ -277,16 +277,14 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
       </div>
 
       {/* Squad */}
-      {supabaseEnabled && (
-        <SquadSection
-          profile={profile}
-          activeId={activeId}
-          squadLeaderboard={squadLeaderboard}
-          onCreateSquad={onCreateSquad}
-          onJoinSquad={onJoinSquad}
-          onLeaveSquad={onLeaveSquad}
-        />
-      )}
+      <SquadSection
+        profile={profile}
+        activeId={activeId}
+        squadLeaderboard={squadLeaderboard}
+        onCreateSquad={onCreateSquad}
+        onJoinSquad={onJoinSquad}
+        onLeaveSquad={onLeaveSquad}
+      />
 
       {/* Leaderboard */}
       {leaderboard.length > 1 && (
