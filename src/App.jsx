@@ -9,6 +9,7 @@ import WorkoutDetail from "./pages/WorkoutDetail";
 import ActiveSession from "./pages/ActiveSession";
 import History from "./pages/History";
 import CreateWorkout from "./pages/CreateWorkout";
+import QuickLog from "./pages/QuickLog";
 import Nav from "./components/Nav";
 
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -354,6 +355,9 @@ export default function App() {
               onSaveExercise={saveCustomExercise}
               customExercises={customExercises}
             />
+          } />
+          <Route path="/log" element={
+            <QuickLog customWorkouts={customWorkouts} onComplete={addToHistory} />
           } />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

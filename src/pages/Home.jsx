@@ -261,7 +261,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
       </div>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-2 gap-2 mb-8">
+      <div className="grid grid-cols-2 gap-2 mb-2">
         <Link
           to="/browse"
           className="flex items-center justify-center gap-2 py-3 bg-neutral-900 border border-neutral-700 pixel-card hover:border-neutral-500 transition-colors"
@@ -276,6 +276,12 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
           + CREATE
         </Link>
       </div>
+      <Link
+        to="/log"
+        className="flex items-center justify-center py-3 mb-8 bg-neutral-900 border border-neutral-700 pixel-card hover:border-neutral-500 transition-colors"
+      >
+        <span className="font-display text-neutral-400" style={{ fontSize: "8px", letterSpacing: "0.12em" }}>✎ LOG PAST WORKOUT</span>
+      </Link>
 
       {/* Squad */}
       <SquadSection

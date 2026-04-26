@@ -333,7 +333,7 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
 
         <div className="flex-1" />
 
-        <div className="flex gap-3 pb-8">
+        <div className="flex gap-3 pb-20">
           {current > 0 && (
             <button
               onClick={() => setCurrent((c) => c - 1)}
