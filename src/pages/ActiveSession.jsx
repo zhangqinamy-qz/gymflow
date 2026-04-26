@@ -172,10 +172,11 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
     return out;
   });
 
-  const [current,   setCurrent]   = useState(0);
-  const [phase,     setPhase]     = useState("active"); // "active" | "logging" | "done"
-  const [startTime]               = useState(Date.now());
+  const [current,    setCurrent]    = useState(0);
+  const [phase,      setPhase]      = useState("active"); // "active" | "logging" | "done"
+  const [startTime]                 = useState(Date.now());
   const [loggedData, setLoggedData] = useState(null);
+  const [transition, setTransition] = useState(null); // null | "toMain" | "toCool"
 
   if (!workout) return (
     <div className="flex items-center justify-center min-h-screen text-neutral-500 text-sm">Workout not found.</div>
@@ -247,16 +248,83 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
       ? `${step.sets} × ${step.reps || step.duration}`
       : step?.reps || step?.duration || "";
 
+  const skipWarmup = () => {
+    const idx = steps.findIndex((s) => s.phase !== "Warm-up" && s.phase !== "Cool-down");
+    setCurrent(idx >= 0 ? idx : steps.length - 1);
+    setTransition(null);
+  };
+
+  const skipMain = () => {
+    const idx = steps.findIndex((s) => s.phase === "Cool-down");
+    setTransition(null);
+    if (idx >= 0) setCurrent(idx); else setPhase("logging");
+  };
+
+  const skipCooldown = () => { setTransition(null); setPhase("logging"); };
+
   const advance = () => {
-    if (isLast) {
-      setPhase("logging");
+    if (isLast) { setPhase("logging"); return; }
+    const cur  = step?.phase;
+    const next = steps[current + 1]?.phase;
+    if (cur === "Warm-up" && next !== "Warm-up") {
+      setTransition("toMain");
+    } else if (cur !== "Cool-down" && next === "Cool-down") {
+      setTransition("toCool");
     } else {
       setCurrent((c) => c + 1);
     }
   };
 
+  // ── Transition card: warm-up → main ──────────────────────────────────────
+  if (transition === "toMain") {
+    return (
+      <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center px-6 text-center">
+        <p className="font-display text-white mb-4" style={{ fontSize: "56px", lineHeight: 1 }}>Ready?</p>
+        <p className="text-neutral-400 text-lg mb-12 max-w-xs leading-relaxed">Let's go to main exercise!</p>
+        <button
+          onClick={() => { setTransition(null); setCurrent((c) => c + 1); }}
+          className="w-full max-w-xs py-4 font-display text-neutral-950 pixel-btn mb-5"
+          style={{ background: "var(--accent)", fontSize: "9px", letterSpacing: "0.15em" }}
+        >
+          LET'S GO →
+        </button>
+        <button onClick={skipMain} className="text-neutral-700 hover:text-neutral-500 text-sm transition-colors">
+          Skip main exercise →
+        </button>
+      </div>
+    );
+  }
+
+  // ── Transition card: main → cool-down ────────────────────────────────────
+  if (transition === "toCool") {
+    return (
+      <div className="min-h-screen bg-sky-950 flex flex-col items-center justify-center px-6 text-center">
+        <p className="font-display text-white mb-4" style={{ fontSize: "56px", lineHeight: 1 }}>Good Job!</p>
+        <p className="text-neutral-400 text-lg mb-12 max-w-xs leading-relaxed">
+          Cool downs are important,<br />otherwise you will be sore.
+        </p>
+        <button
+          onClick={() => { setTransition(null); setCurrent((c) => c + 1); }}
+          className="w-full max-w-xs py-4 font-display text-neutral-950 pixel-btn mb-5"
+          style={{ background: "var(--accent)", fontSize: "9px", letterSpacing: "0.15em" }}
+        >
+          START COOL-DOWN
+        </button>
+        <button onClick={skipCooldown} className="text-neutral-700 hover:text-neutral-500 text-sm transition-colors">
+          Skip cool-down →
+        </button>
+      </div>
+    );
+  }
+
+  // ── Phase background ──────────────────────────────────────────────────────
+  const phaseBg =
+    step?.phase === "Warm-up"   ? "bg-orange-950" :
+    step?.phase === "Cool-down" ? "bg-sky-950"    :
+    "bg-neutral-950";
+
   return (
-    <div className="min-h-screen bg-neutral-950 flex flex-col">
+    <div className={`min-h-screen ${phaseBg} flex flex-col transition-colors duration-700`}>
       {/* Progress bar */}
       <div className="h-0.5 bg-neutral-900">
         <div className="h-full transition-all duration-500" style={{ width: `${progress}%`, background: "var(--accent)" }} />
@@ -332,6 +400,27 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
         )}
 
         <div className="flex-1" />
+
+        <div className="text-center mb-2">
+          <button onClick={advance} className="text-neutral-700 hover:text-neutral-500 text-xs transition-colors">
+            Skip this exercise →
+          </button>
+        </div>
+
+        {step?.phase === "Warm-up" && (
+          <div className="text-center mb-3">
+            <button onClick={skipWarmup} className="text-neutral-700 hover:text-neutral-500 text-xs transition-colors">
+              Skip warm-up →
+            </button>
+          </div>
+        )}
+        {step?.phase === "Cool-down" && (
+          <div className="text-center mb-3">
+            <button onClick={skipCooldown} className="text-neutral-700 hover:text-neutral-500 text-xs transition-colors">
+              Skip cool-down →
+            </button>
+          </div>
+        )}
 
         <div className="flex gap-3 pb-20">
           {current > 0 && (
