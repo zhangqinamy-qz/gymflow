@@ -70,6 +70,7 @@ export default function App() {
 
   // ─── Squad leaderboard ────────────────────────────────────────────────────
   const [squadLeaderboard, setSquadLeaderboard] = useState([]);
+  const fetchLeaderboardRef = useRef(null);
 
   useEffect(() => {
     if (!supabase || !profile?.squadId) { setSquadLeaderboard([]); return; }
@@ -111,8 +112,14 @@ export default function App() {
       await supabase.from("workout_history").upsert(rows, { onConflict: "id" });
     };
 
+    fetchLeaderboardRef.current = fetchLeaderboard;
+
     const init = async () => { await backfill(); await fetchLeaderboard(); };
     init();
+
+    // Re-fetch when user returns to the tab (mobile backgrounding drops real-time)
+    const onVisible = () => { if (!document.hidden) fetchLeaderboard(); };
+    document.addEventListener("visibilitychange", onVisible);
 
     const channel = supabase
       .channel(`squad:${profile.squadId}`)
@@ -120,7 +127,7 @@ export default function App() {
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "squad_members",   filter: `squad_id=eq.${profile.squadId}` }, fetchLeaderboard)
       .subscribe();
 
-    return () => { cancelled = true; supabase.removeChannel(channel); };
+    return () => { cancelled = true; document.removeEventListener("visibilitychange", onVisible); supabase.removeChannel(channel); };
   }, [profile?.squadId]);
 
   // ─── History sync ─────────────────────────────────────────────────────────
@@ -223,7 +230,7 @@ export default function App() {
         duration:     log.duration || 0,
         stars,
       });
-      supabase.from("workout_history").insert({
+      supabase.from("workout_history").upsert({
         id:           entry.id,
         squad_id:     profile.squadId,
         profile_name: profile.name,
@@ -235,7 +242,7 @@ export default function App() {
         distance:     entry.distance     || null,
         distance_unit: entry.distanceUnit || null,
         heart_rate:   entry.heartRate    || null,
-      });
+      }, { onConflict: "id" }).then(() => fetchLeaderboardRef.current?.());
     }
   };
 
