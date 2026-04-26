@@ -77,25 +77,46 @@ export default function App() {
 
     const fetchLeaderboard = async () => {
       const { data } = await supabase
-        .from("squad_sessions")
-        .select("profile_id, profile_name, stars")
+        .from("workout_history")
+        .select("profile_name, stars")
         .eq("squad_id", profile.squadId);
       if (cancelled || !data) return;
       const agg = {};
-      data.forEach(({ profile_id, profile_name, stars }) => {
+      data.forEach(({ profile_name, stars }) => {
         const key = profile_name.toLowerCase();
-        if (!agg[key]) agg[key] = { id: profile_id, name: profile_name, stars: 0, sessions: 0 };
+        if (!agg[key]) agg[key] = { name: profile_name, stars: 0, sessions: 0 };
         agg[key].stars += stars || 1;
         agg[key].sessions++;
       });
       setSquadLeaderboard(Object.values(agg).sort((a, b) => b.stars - a.stars));
     };
 
-    fetchLeaderboard();
+    // Backfill any local sessions that weren't synced when this profile joined the squad.
+    const backfill = async () => {
+      const local = allHistory[activeId] || [];
+      if (local.length === 0) return;
+      const rows = local.map((e) => ({
+        id:            e.id,
+        squad_id:      profile.squadId,
+        profile_name:  profile.name,
+        date:          e.date,
+        title:         e.title,
+        duration:      e.duration || 0,
+        stars:         e.stars || 1,
+        calories:      e.calories      || null,
+        distance:      e.distance      || null,
+        distance_unit: e.distanceUnit  || null,
+        heart_rate:    e.heartRate     || null,
+      }));
+      await supabase.from("workout_history").upsert(rows, { onConflict: "id" });
+    };
+
+    const init = async () => { await backfill(); await fetchLeaderboard(); };
+    init();
 
     const channel = supabase
       .channel(`squad:${profile.squadId}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "squad_sessions",  filter: `squad_id=eq.${profile.squadId}` }, fetchLeaderboard)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "workout_history", filter: `squad_id=eq.${profile.squadId}` }, fetchLeaderboard)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "squad_members",   filter: `squad_id=eq.${profile.squadId}` }, fetchLeaderboard)
       .subscribe();
 

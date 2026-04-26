@@ -109,7 +109,7 @@ function SquadSection({ profile, activeId, squadLeaderboard, onCreateSquad, onJo
       {squadLeaderboard.length > 0 ? (
         <div className="bg-neutral-900 pixel-card overflow-hidden">
           {squadLeaderboard.map((m, i) => {
-            const isMe = m.id === activeId;
+            const isMe = m.name.toLowerCase() === profile?.name?.toLowerCase();
             const rankColor = RANK_COLORS[i] || "#555";
             return (
               <div key={m.id} className={`flex items-center gap-3 px-4 py-3 border-b border-neutral-800 last:border-b-0 ${isMe ? "bg-neutral-800/60" : ""}`}>
