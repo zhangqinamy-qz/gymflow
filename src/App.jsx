@@ -95,7 +95,8 @@ export default function App() {
 
     const channel = supabase
       .channel(`squad:${profile.squadId}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "squad_sessions", filter: `squad_id=eq.${profile.squadId}` }, fetchLeaderboard)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "squad_sessions",  filter: `squad_id=eq.${profile.squadId}` }, fetchLeaderboard)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "squad_members",   filter: `squad_id=eq.${profile.squadId}` }, fetchLeaderboard)
       .subscribe();
 
     return () => { cancelled = true; supabase.removeChannel(channel); };
