@@ -63,7 +63,7 @@ export const exercises = [
     equipment: [EQUIPMENT.DUMBBELL],
     primary: [MUSCLES.SHOULDERS, MUSCLES.TRICEPS],
     secondary: [MUSCLES.CORE],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=Did01dFR3Lk",
     modification: "Use lighter weight, seated",
   },
   {
@@ -73,7 +73,7 @@ export const exercises = [
     equipment: [EQUIPMENT.DUMBBELL],
     primary: [MUSCLES.SHOULDERS],
     secondary: [],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=XPPfnSEATJA",
     modification: "Use lighter weight",
   },
   // ── STRENGTH: PULL ────────────────────────────────────────────────────────
@@ -84,7 +84,7 @@ export const exercises = [
     equipment: [EQUIPMENT.PULL_UP_BAR],
     primary: [MUSCLES.BACK, MUSCLES.BICEPS],
     secondary: [MUSCLES.FOREARMS, MUSCLES.CORE],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=eGo4IYlbE5g&t=5s",
     modification: "Use resistance band for assistance",
   },
   {
@@ -94,7 +94,7 @@ export const exercises = [
     equipment: [EQUIPMENT.PULL_UP_BAR],
     primary: [MUSCLES.BICEPS, MUSCLES.BACK],
     secondary: [MUSCLES.FOREARMS],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=mRy9m2Q9_1I",
     modification: "Use resistance band for assistance",
   },
   {
@@ -134,7 +134,7 @@ export const exercises = [
     equipment: [EQUIPMENT.CABLE_MACHINE],
     primary: [MUSCLES.BACK],
     secondary: [MUSCLES.BICEPS, MUSCLES.CORE],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=xQNrFHEMhI4",
     modification: "Use lighter weight, keep back straight",
   },
   {
@@ -144,7 +144,7 @@ export const exercises = [
     equipment: [EQUIPMENT.DUMBBELL],
     primary: [MUSCLES.BICEPS],
     secondary: [MUSCLES.FOREARMS],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=cBSD6mQIPQk",
     modification: "Use lighter weight",
   },
   // ── STRENGTH: LEGS ────────────────────────────────────────────────────────
@@ -155,7 +155,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.QUADS, MUSCLES.GLUTES],
     secondary: [MUSCLES.HAMSTRINGS, MUSCLES.CORE],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=xqvCmoLULNY",
     modification: "Squat to a chair",
   },
   {
@@ -165,7 +165,7 @@ export const exercises = [
     equipment: [EQUIPMENT.DUMBBELL],
     primary: [MUSCLES.QUADS, MUSCLES.GLUTES],
     secondary: [MUSCLES.CORE, MUSCLES.HAMSTRINGS],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=pEGfGwp6IEA",
     modification: "Use lighter weight",
   },
   {
@@ -175,7 +175,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.QUADS, MUSCLES.GLUTES],
     secondary: [MUSCLES.HAMSTRINGS, MUSCLES.CORE],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=xrPteyQLGAo",
     modification: "Hold a wall for balance",
   },
   {
@@ -185,7 +185,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.GLUTES, MUSCLES.HAMSTRINGS],
     secondary: [MUSCLES.CORE],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=OUgsJ8-Vi0E",
     modification: "Keep both feet flat, reduce range",
   },
   {
@@ -195,7 +195,7 @@ export const exercises = [
     equipment: [EQUIPMENT.DUMBBELL, EQUIPMENT.BENCH],
     primary: [MUSCLES.GLUTES],
     secondary: [MUSCLES.HAMSTRINGS, MUSCLES.CORE],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=29OfN4ztW_g",
     modification: "Do glute bridge on floor instead",
   },
   {
@@ -205,7 +205,7 @@ export const exercises = [
     equipment: [EQUIPMENT.DUMBBELL],
     primary: [MUSCLES.HAMSTRINGS, MUSCLES.GLUTES],
     secondary: [MUSCLES.BACK, MUSCLES.CORE],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=7j-2w4-P14I",
     modification: "Use lighter weight, reduce range",
   },
   // ── STRENGTH: CORE ────────────────────────────────────────────────────────
@@ -226,7 +226,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.CORE],
     secondary: [MUSCLES.HIP_FLEXORS],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=GbSC02oU3To",
     modification: "Extend one limb at a time only",
   },
   {
@@ -236,7 +236,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.CORE, MUSCLES.HIP_FLEXORS],
     secondary: [MUSCLES.SHOULDERS, MUSCLES.CHEST],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=kLh-uczlPLg",
     modification: "Slow the pace",
   },
   // ── CARDIO ────────────────────────────────────────────────────────────────
@@ -268,7 +268,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.HIP_FLEXORS, MUSCLES.HAMSTRINGS],
     secondary: [],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=naW8u72lOzI",
     modification: null,
   },
   {
@@ -288,7 +288,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.HIP_FLEXORS, MUSCLES.GLUTES],
     secondary: [],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=qkrJXGVj_OQ",
     modification: null,
   },
   {
@@ -298,7 +298,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.CORE, MUSCLES.HAMSTRINGS],
     secondary: [MUSCLES.CHEST, MUSCLES.SHOULDERS],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=0HFXsIMKqUg",
     modification: "Bend knees during walk-out",
   },
   {
@@ -308,7 +308,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.HIP_FLEXORS, MUSCLES.BACK],
     secondary: [MUSCLES.HAMSTRINGS, MUSCLES.SHOULDERS],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=-CiWQ2IvY34",
     modification: "Reduce rotation range",
   },
   // ── COOL-DOWN / STRETCHES ─────────────────────────────────────────────────
@@ -319,7 +319,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.QUADS],
     secondary: [],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=zi5__zBRzYc",
     modification: "Hold a wall for balance",
   },
   {
@@ -329,7 +329,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.HAMSTRINGS],
     secondary: [],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/shorts/aJvfeuu71gw",
     modification: "Bend knee slightly",
   },
   {
@@ -339,7 +339,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.CHEST, MUSCLES.SHOULDERS],
     secondary: [],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/shorts/Cka38QWoVeY",
     modification: null,
   },
   {
@@ -349,7 +349,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.BACK, MUSCLES.SHOULDERS],
     secondary: [MUSCLES.HIP_FLEXORS],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=kH12QrSGedM",
     modification: "Place pillow under knees",
   },
   {
@@ -359,7 +359,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.HIP_FLEXORS],
     secondary: [MUSCLES.QUADS],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/watch?v=Q4Ko275cluo",
     modification: "Place cushion under knee",
   },
   {
@@ -369,7 +369,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.CALVES],
     secondary: [],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/shorts/7SO6QzfBRaE",
     modification: null,
   },
   {
@@ -379,7 +379,7 @@ export const exercises = [
     equipment: [EQUIPMENT.BODYWEIGHT],
     primary: [MUSCLES.SHOULDERS],
     secondary: [MUSCLES.BACK],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/shorts/aIq0fLi8iak",
     modification: null,
   },
 ];
