@@ -277,8 +277,14 @@ export default function App() {
     if (id === activeId) setActiveId(remaining.length > 0 ? remaining[0].id : null);
   };
 
-  const deleteHistoryEntry = (index) =>
+  const deleteHistoryEntry = (index) => {
+    const entry = (allHistory[activeId] || [])[index];
     setAllHistory((h) => ({ ...h, [activeId]: (h[activeId] || []).filter((_, i) => i !== index) }));
+    if (supabase && entry?.id && profile?.squadId) {
+      supabase.from("workout_history").delete().eq("id", entry.id)
+        .then(() => fetchLeaderboardRef.current?.());
+    }
+  };
 
   const saveCustomWorkout   = (w) => setCustomWorkouts((prev) => [w, ...prev]);
   const deleteCustomWorkout = (id) => setCustomWorkouts((prev) => prev.filter((w) => w.id !== id));
