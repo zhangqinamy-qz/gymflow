@@ -95,7 +95,7 @@ export default function App() {
   // ──────────────────────────────────────────────────────────────────────────
 
   const addToHistory = (log) => {
-    const stars = (log.duration || 0) >= 60 ? 3 : 1;
+    const stars = (log.duration || 0) >= 60 ? 3 : (log.duration || 0) >= 45 ? 2 : 1;
     setAllHistory((h) => ({ ...h, [activeId]: [{ ...log, stars }, ...(h[activeId] || [])] }));
     if (supabase && profile?.squadId) {
       supabase.from("squad_sessions").insert({

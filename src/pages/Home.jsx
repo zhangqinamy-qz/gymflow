@@ -335,7 +335,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
             })}
           </div>
           <p className="text-neutral-700 text-xs mt-2 text-center">
-            1★ per session · 3★ for 60+ min workouts
+            1★ for 30 min · 2★ for 45 min · 3★ for 60+ min
           </p>
         </div>
       )}

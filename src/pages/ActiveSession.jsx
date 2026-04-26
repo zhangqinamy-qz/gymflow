@@ -43,7 +43,7 @@ function LogForm({ workout, elapsedMin, onSubmit }) {
     const dur = parseInt(duration) || elapsedMin;
     onSubmit({
       duration:  dur,
-      stars:     dur >= 60 ? 3 : 1,
+      stars:     dur >= 60 ? 3 : dur >= 45 ? 2 : 1,
       calories:  calories  ? parseInt(calories)  : null,
       distance:  distance  ? parseFloat(distance): null,
       distanceUnit: unit,
@@ -128,7 +128,7 @@ function LogForm({ workout, elapsedMin, onSubmit }) {
 
       <div className="flex gap-3 mt-4">
         <button
-          onClick={() => onSubmit({ duration: elapsedMin, stars: elapsedMin >= 60 ? 3 : 1, calories: null, distance: null, heartRate: null })}
+          onClick={() => onSubmit({ duration: elapsedMin, stars: elapsedMin >= 60 ? 3 : elapsedMin >= 45 ? 2 : 1, calories: null, distance: null, heartRate: null })}
           className="flex-1 py-4 text-sm text-neutral-500 border border-neutral-800 hover:border-neutral-600 hover:text-neutral-400 pixel-btn-ghost transition-colors"
         >
           Skip
@@ -187,10 +187,10 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
           {"★".repeat(starsEarned)}{"☆".repeat(3 - starsEarned)}
         </p>
         <h1 className="font-display text-white mb-1" style={{ fontSize: "20px", letterSpacing: "0.2em", color: "var(--accent)" }}>
-          {starsEarned === 3 ? "LEGENDARY!" : "DONE!"}
+          {starsEarned === 3 ? "LEGENDARY!" : starsEarned === 2 ? "GREAT WORK!" : "DONE!"}
         </h1>
         <p className="font-display text-neutral-500 mb-1" style={{ fontSize: "8px" }}>
-          {starsEarned === 3 ? "+3 STARS — OVER 60 MIN!" : "+1 STAR"}
+          {starsEarned === 3 ? "+3 STARS — OVER 60 MIN!" : starsEarned === 2 ? "+2 STARS — OVER 45 MIN!" : "+1 STAR"}
         </p>
         <p className="text-neutral-600 text-sm mt-2">{workout.title}</p>
         {loggedData && (
