@@ -1,9 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-console.log("[supabase] url:", url ? url.slice(0, 30) : "MISSING");
-console.log("[supabase] key:", key ? "present" : "MISSING");
-
-export const supabase = url && key && !url.startsWith("your_") ? createClient(url, key) : null;
+export const supabase = createClient(
+  "https://hrbsmoiqpgewrmusjulp.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhyYnNtb2lxcGdld3JtdXNqdWxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNTg3MzgsImV4cCI6MjA5MjczNDczOH0.DalFoqa_9rfQLQ1jpwxEsaP19pXiTy6kYciB_mb3TSs"
+);
