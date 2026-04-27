@@ -200,11 +200,40 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
     return "GOOD EVENING";
   };
 
-  const featured = [CATEGORIES.RUNNING, CATEGORIES.BALL, CATEGORIES.STRENGTH].map(
-    (cat) =>
-      workouts.find((w) => w.category === cat && w.difficulty === profile?.level) ||
-      workouts.find((w) => w.category === cat)
-  );
+  // Smart recommendations: avoid focus areas done this week, prefer matching level
+  const thisWeek = history.filter((h) => new Date(h.date) >= weekStart);
+  const focusArea = (w) => w.subcategory || w.category;
+
+  const doneFocus = {};
+  thisWeek.forEach((log) => {
+    const matched = workouts.find((w) => w.title === log.title);
+    if (!matched) return;
+    const fa = focusArea(matched);
+    const d = new Date(log.date);
+    if (!doneFocus[fa] || d > doneFocus[fa]) doneFocus[fa] = d;
+  });
+
+  const scored = workouts
+    .filter((w) => w.category !== CATEGORIES.BALL)
+    .map((w) => {
+      const fa = focusArea(w);
+      const last = doneFocus[fa];
+      let score = last
+        ? (Date.now() - last) / (1000 * 60 * 60 * 24)
+        : 100;
+      if (w.difficulty === profile?.level) score += 5;
+      return { w, fa, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  const featured = [];
+  const usedFocus = new Set();
+  for (const { w, fa } of scored) {
+    if (usedFocus.has(fa)) continue;
+    featured.push(w);
+    usedFocus.add(fa);
+    if (featured.length === 3) break;
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 pt-10 pb-6">
@@ -348,10 +377,13 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
       )}
 
       {/* Recommended */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-1">
         <h2 className="font-display text-white" style={{ fontSize: "9px", letterSpacing: "0.12em" }}>RECOMMENDED</h2>
         <Link to="/browse" className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors">See all →</Link>
       </div>
+      <p className="text-neutral-700 text-xs mb-3">
+        {thisWeek.length > 0 ? "Avoiding what you've already done this week." : "Get your week started."}
+      </p>
       <div className="flex flex-col gap-3">
         {featured.map((w) => w && <WorkoutCard key={w.id} workout={w} />)}
       </div>
