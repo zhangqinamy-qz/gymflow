@@ -357,7 +357,7 @@ export default function App() {
             />
           } />
           <Route path="/log" element={
-            <QuickLog customWorkouts={customWorkouts} onComplete={addToHistory} />
+            <QuickLog customWorkouts={customWorkouts} onComplete={addToHistory} onSaveWorkout={saveCustomWorkout} />
           } />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
