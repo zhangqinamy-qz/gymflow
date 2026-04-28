@@ -170,7 +170,11 @@ export default function Browse({ profile, customWorkouts = [], onDeleteCustom })
                           <span className={`font-display ${catColor[w.category] || "text-neutral-500"}`} style={{ fontSize: "7px", letterSpacing: "0.1em" }}>
                             {w.subcategory || w.category}
                           </span>
-                          {w.isCustom && <span className="font-display text-purple-400" style={{ fontSize: "6px" }}>CUSTOM</span>}
+                          {w.isCustom && (
+                            <span className="font-display text-purple-400" style={{ fontSize: "6px" }}>
+                              {w.createdBy ? `by ${w.createdBy}` : "CUSTOM"}
+                            </span>
+                          )}
                         </div>
                         <h3 className="text-white font-semibold text-sm mt-1">{w.title}</h3>
                       </div>

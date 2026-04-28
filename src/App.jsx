@@ -183,6 +183,40 @@ export default function App() {
     return () => { cancelled = true; supabase.removeChannel(channel); };
   }, [profile?.squadId, profile?.name]);
 
+  // ─── Squad custom workouts sync ───────────────────────────────────────────
+  useEffect(() => {
+    if (!supabase || !profile?.squadId) return;
+    let cancelled = false;
+
+    const mergeRemote = (rows) => {
+      setCustomWorkouts((prev) => {
+        const localIds = new Set(prev.map((w) => w.id));
+        const incoming = rows.map((r) => r.workout).filter((w) => !localIds.has(w.id));
+        return incoming.length === 0 ? prev : [...prev, ...incoming];
+      });
+    };
+
+    const removeRemote = (id) => {
+      setCustomWorkouts((prev) => prev.filter((w) => w.id !== id || w.createdBy === profile?.name));
+    };
+
+    supabase
+      .from("custom_workouts")
+      .select("*")
+      .eq("squad_id", profile.squadId)
+      .then(({ data }) => { if (!cancelled && data) mergeRemote(data); });
+
+    const channel = supabase
+      .channel(`custom_workouts:${profile.squadId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "custom_workouts", filter: `squad_id=eq.${profile.squadId}` },
+        (payload) => mergeRemote([payload.new]))
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "custom_workouts", filter: `squad_id=eq.${profile.squadId}` },
+        (payload) => removeRemote(payload.old.id))
+      .subscribe();
+
+    return () => { cancelled = true; supabase.removeChannel(channel); };
+  }, [profile?.squadId]);
+
   // ─── Squad join / create / leave ──────────────────────────────────────────
   const createSquad = async () => {
     if (!supabase || !profile) throw new Error("Supabase not configured");
@@ -287,8 +321,24 @@ export default function App() {
     }
   };
 
-  const saveCustomWorkout   = (w) => setCustomWorkouts((prev) => [w, ...prev]);
-  const deleteCustomWorkout = (id) => setCustomWorkouts((prev) => prev.filter((w) => w.id !== id));
+  const saveCustomWorkout = (w) => {
+    const workout = { ...w, createdBy: profile?.name || null };
+    setCustomWorkouts((prev) => prev.some((p) => p.id === workout.id) ? prev : [workout, ...prev]);
+    if (supabase && profile?.squadId) {
+      supabase.from("custom_workouts").upsert({
+        id: workout.id,
+        squad_id: profile.squadId,
+        created_by: profile.name,
+        workout,
+      });
+    }
+  };
+  const deleteCustomWorkout = (id) => {
+    setCustomWorkouts((prev) => prev.filter((w) => w.id !== id));
+    if (supabase && profile?.squadId) {
+      supabase.from("custom_workouts").delete().eq("id", id);
+    }
+  };
   const saveCustomExercise  = (e) => setCustomExercises((prev) => [e, ...prev]);
 
   const [workoutOverrides, setWorkoutOverrides] = useLocalStorage("gym_workout_overrides", {});
