@@ -306,10 +306,15 @@ export default function App() {
   };
 
   const deleteProfile = (id) => {
+    const deleted = profiles.find((p) => p.id === id);
     const remaining = profiles.filter((p) => p.id !== id);
     setProfiles(remaining);
     setAllHistory((h) => { const next = { ...h }; delete next[id]; return next; });
     if (id === activeId) setActiveId(remaining.length > 0 ? remaining[0].id : null);
+    if (supabase && deleted?.squadId && deleted?.name) {
+      supabase.from("workout_history").delete().eq("squad_id", deleted.squadId).eq("profile_name", deleted.name);
+      supabase.from("squad_sessions").delete().eq("squad_id", deleted.squadId).eq("profile_name", deleted.name);
+    }
   };
 
   const deleteHistoryEntry = (index) => {
