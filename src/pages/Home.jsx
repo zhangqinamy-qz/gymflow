@@ -323,7 +323,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
       />
 
       {/* Leaderboard */}
-      {leaderboard.length > 1 && (
+      {leaderboard.length > 1 && !profile?.squadId && (
         <div className="mb-8">
           <h2 className="font-display text-white mb-3" style={{ fontSize: "9px", letterSpacing: "0.12em" }}>
             LEADERBOARD

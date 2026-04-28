@@ -18,7 +18,7 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 }
 
-function Calendar({ allHistory, profiles }) {
+function Calendar({ allHistory, profiles, squadHistory = {} }) {
   const now = new Date();
   const [year, setYear]   = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
@@ -32,8 +32,10 @@ function Calendar({ allHistory, profiles }) {
     else setMonth((m) => m + 1);
   };
 
-  // Build dayMap: "YYYY-MM-DD" → { [profileId]: { color, stars, name } }
+  // Build dayMap: "YYYY-MM-DD" → { [key]: { color, stars, name } }
   const dayMap = {};
+  const localNames = new Set(profiles.map((p) => p.name.toLowerCase()));
+
   profiles.forEach((p, i) => {
     const color = PROFILE_COLORS[i % PROFILE_COLORS.length];
     (allHistory[p.id] || []).forEach((log) => {
@@ -41,6 +43,20 @@ function Calendar({ allHistory, profiles }) {
       if (!dayMap[key]) dayMap[key] = {};
       if (!dayMap[key][p.id]) dayMap[key][p.id] = { color, stars: 0, name: p.name };
       dayMap[key][p.id].stars = Math.max(dayMap[key][p.id].stars, log.stars || 1);
+    });
+  });
+
+  // Squad members not in local profiles
+  const squadMembers = Object.entries(squadHistory)
+    .filter(([name]) => !localNames.has(name.toLowerCase()));
+  squadMembers.forEach(([name, sessions], i) => {
+    const color = PROFILE_COLORS[(profiles.length + i) % PROFILE_COLORS.length];
+    sessions.forEach((log) => {
+      const key = log.date.slice(0, 10);
+      if (!dayMap[key]) dayMap[key] = {};
+      const dotKey = `squad_${name}`;
+      if (!dayMap[key][dotKey]) dayMap[key][dotKey] = { color, stars: 0, name };
+      dayMap[key][dotKey].stars = Math.max(dayMap[key][dotKey].stars, log.stars || 1);
     });
   });
 
@@ -117,12 +133,18 @@ function Calendar({ allHistory, profiles }) {
       </div>
 
       {/* Legend */}
-      {profiles.length > 0 && (
+      {(profiles.length > 0 || squadMembers.length > 0) && (
         <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-neutral-800">
           {profiles.map((p, i) => (
             <div key={p.id} className="flex items-center gap-1.5">
               <div className="w-2 h-2 flex-shrink-0" style={{ background: PROFILE_COLORS[i % PROFILE_COLORS.length] }} />
               <span className="text-neutral-600 text-xs">{p.name}</span>
+            </div>
+          ))}
+          {squadMembers.map(([name], i) => (
+            <div key={name} className="flex items-center gap-1.5">
+              <div className="w-2 h-2 flex-shrink-0" style={{ background: PROFILE_COLORS[(profiles.length + i) % PROFILE_COLORS.length] }} />
+              <span className="text-neutral-600 text-xs">{name}</span>
             </div>
           ))}
         </div>
@@ -131,7 +153,7 @@ function Calendar({ allHistory, profiles }) {
   );
 }
 
-export default function History({ history, profile, allHistory = {}, profiles = [], onDeleteEntry, onToggleDislike }) {
+export default function History({ history, profile, allHistory = {}, profiles = [], onDeleteEntry, onToggleDislike, squadHistory = {} }) {
   const totalMin = history.reduce((s, h) => s + (h.duration || 0), 0);
   const thisWeek = history.filter((h) => {
     const cutoff = new Date();
@@ -159,7 +181,7 @@ export default function History({ history, profile, allHistory = {}, profiles = 
       </div>
 
       {/* Calendar */}
-      <Calendar allHistory={allHistory} profiles={profiles} />
+      <Calendar allHistory={allHistory} profiles={profiles} squadHistory={squadHistory} />
 
       {history.length === 0 ? (
         <div className="text-center py-16">
