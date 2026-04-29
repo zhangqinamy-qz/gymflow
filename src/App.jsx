@@ -10,6 +10,7 @@ import ActiveSession from "./pages/ActiveSession";
 import History from "./pages/History";
 import CreateWorkout from "./pages/CreateWorkout";
 import QuickLog from "./pages/QuickLog";
+import SquadMemberHistory from "./pages/SquadMemberHistory";
 import Nav from "./components/Nav";
 
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -81,19 +82,19 @@ export default function App() {
     const fetchLeaderboard = async () => {
       const { data } = await supabase
         .from("workout_history")
-        .select("profile_name, stars, date, title, duration")
+        .select("profile_name, stars, date, title, duration, calories, distance, distance_unit, heart_rate")
         .eq("squad_id", profile.squadId)
         .order("date", { ascending: false });
       if (cancelled || !data) return;
       const agg = {};
       const hist = {};
-      data.forEach(({ profile_name, stars, date, title, duration }) => {
+      data.forEach(({ profile_name, stars, date, title, duration, calories, distance, distance_unit, heart_rate }) => {
         const key = profile_name.toLowerCase();
         if (!agg[key]) agg[key] = { name: profile_name, stars: 0, sessions: 0 };
         agg[key].stars += stars || 1;
         agg[key].sessions++;
         if (!hist[profile_name]) hist[profile_name] = [];
-        hist[profile_name].push({ date, stars: stars || 1, title, duration });
+        hist[profile_name].push({ date, stars: stars || 1, title, duration, calories, distance, distanceUnit: distance_unit, heartRate: heart_rate });
       });
       setSquadLeaderboard(Object.values(agg).sort((a, b) => b.stars - a.stars));
       setSquadHistory(hist);
@@ -421,6 +422,9 @@ export default function App() {
           } />
           <Route path="/log" element={
             <QuickLog customWorkouts={customWorkouts} onComplete={addToHistory} onSaveWorkout={saveCustomWorkout} />
+          } />
+          <Route path="/squad/:memberName" element={
+            <SquadMemberHistory squadHistory={squadHistory} />
           } />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

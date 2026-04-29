@@ -1,10 +1,10 @@
 ﻿import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { workouts, CATEGORIES } from "../data/workouts";
 import ProfileSwitcher from "../components/ProfileSwitcher";
 
 function SquadSection({ profile, activeId, squadLeaderboard, squadHistory = {}, onCreateSquad, onJoinSquad, onLeaveSquad }) {
-  const [expandedMember, setExpandedMember] = useState(null);
+  const navigate = useNavigate();
   const [joinCode, setJoinCode]   = useState("");
   const [joining,  setJoining]    = useState(false);
   const [creating, setCreating]   = useState(false);
@@ -110,51 +110,32 @@ function SquadSection({ profile, activeId, squadLeaderboard, squadHistory = {}, 
       {squadLeaderboard.length > 0 ? (
         <div className="bg-neutral-900 pixel-card overflow-hidden">
           {squadLeaderboard.map((m, i) => {
-            const isMe     = m.name.toLowerCase() === profile?.name?.toLowerCase();
+            const isMe      = m.name.toLowerCase() === profile?.name?.toLowerCase();
             const rankColor = RANK_COLORS[i] || "#555";
-            const isOpen   = expandedMember === m.name;
-            const sessions = squadHistory[m.name] || [];
             return (
-              <div key={m.name} className="border-b border-neutral-800 last:border-b-0">
-                <button
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-left ${isMe ? "bg-neutral-800/60" : ""}`}
-                  onClick={() => setExpandedMember(isOpen ? null : m.name)}
-                >
-                  <span className="font-display w-6 flex-shrink-0" style={{ fontSize: "8px", color: rankColor }}>
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center border" style={{ borderColor: rankColor, background: `${rankColor}18` }}>
-                    <span className="font-display" style={{ fontSize: "7px", color: rankColor }}>{m.name[0]?.toUpperCase()}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">
-                      {m.name}{isMe && <span className="text-neutral-600 text-xs ml-1">(you)</span>}
-                    </p>
-                    <p className="text-neutral-600 text-xs">{m.sessions} session{m.sessions !== 1 ? "s" : ""}</p>
-                  </div>
-                  <div className="flex-shrink-0 text-right">
-                    <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>{m.stars}</p>
-                    <p className="text-neutral-600" style={{ fontSize: "9px" }}>★ stars</p>
-                  </div>
-                  <span className="text-neutral-600 text-xs ml-2">{isOpen ? "▲" : "▼"}</span>
-                </button>
-                {isOpen && (
-                  <div className="px-4 pb-3 border-t border-neutral-800/60 bg-neutral-950/40">
-                    {sessions.length === 0 ? (
-                      <p className="text-neutral-600 text-xs py-2">No sessions yet.</p>
-                    ) : (
-                      <div className="flex flex-col gap-1 pt-2">
-                        {sessions.map((s, j) => (
-                          <div key={j} className="flex items-center justify-between text-xs">
-                            <span className="text-neutral-300">{s.title || "Workout"}</span>
-                            <span className="text-neutral-600">{s.duration ? `${s.duration} min` : ""}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <button
+                key={m.name}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left border-b border-neutral-800 last:border-b-0 hover:bg-neutral-800/40 transition-colors ${isMe ? "bg-neutral-800/60" : ""}`}
+                onClick={() => navigate(`/squad/${encodeURIComponent(m.name)}`)}
+              >
+                <span className="font-display w-6 flex-shrink-0" style={{ fontSize: "8px", color: rankColor }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center border" style={{ borderColor: rankColor, background: `${rankColor}18` }}>
+                  <span className="font-display" style={{ fontSize: "7px", color: rankColor }}>{m.name[0]?.toUpperCase()}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-sm font-medium truncate">
+                    {m.name}{isMe && <span className="text-neutral-600 text-xs ml-1">(you)</span>}
+                  </p>
+                  <p className="text-neutral-600 text-xs">{m.sessions} session{m.sessions !== 1 ? "s" : ""}</p>
+                </div>
+                <div className="flex-shrink-0 text-right">
+                  <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>{m.stars}</p>
+                  <p className="text-neutral-600" style={{ fontSize: "9px" }}>★ stars</p>
+                </div>
+                <span className="text-neutral-600 text-xs ml-2">›</span>
+              </button>
             );
           })}
         </div>
