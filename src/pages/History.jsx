@@ -1,6 +1,6 @@
 ﻿import { useState } from "react";
 import { Link } from "react-router-dom";
-import { CATEGORIES } from "../data/workouts";
+import { CATEGORIES, workouts as presetWorkouts } from "../data/workouts";
 import { exerciseById } from "../data/exercises";
 
 const PROFILE_COLORS = ["var(--accent)", "#38bdf8", "#f472b6", "#fb923c", "#a78bfa", "#34d399"];
@@ -93,7 +93,7 @@ function Calendar({ allHistory, profiles, squadHistory = {} }) {
           const profileEntries = Object.values(dayMap[key] || {});
           const hasWorkout = profileEntries.length > 0;
           const isToday    = key === todayKey;
-          const maxStars   = hasWorkout ? Math.max(...profileEntries.map((e) => e.stars)) : 0;
+          const solo       = profileEntries.length === 1 ? profileEntries[0] : null;
 
           return (
             <div
@@ -121,10 +121,10 @@ function Calendar({ allHistory, profiles, squadHistory = {} }) {
                 </div>
               )}
 
-              {/* Stars */}
-              {maxStars > 0 && (
-                <span style={{ color: "var(--accent)", fontSize: "5px", lineHeight: 1, marginTop: "1px" }}>
-                  {"★".repeat(maxStars === 3 ? 3 : 1)}
+              {/* Stars — only when one person worked out, in their color */}
+              {solo && solo.stars > 0 && (
+                <span style={{ color: solo.color, fontSize: "5px", lineHeight: 1, marginTop: "1px" }}>
+                  {"★".repeat(solo.stars === 3 ? 3 : 1)}
                 </span>
               )}
             </div>
@@ -153,7 +153,9 @@ function Calendar({ allHistory, profiles, squadHistory = {} }) {
   );
 }
 
-export default function History({ history, profile, allHistory = {}, profiles = [], onDeleteEntry, onToggleDislike, squadHistory = {} }) {
+export default function History({ history, profile, allHistory = {}, profiles = [], onDeleteEntry, onToggleDislike, squadHistory = {}, customWorkouts = [] }) {
+  const [expandedIdx, setExpandedIdx] = useState(null);
+  const allWorkouts = [...presetWorkouts, ...customWorkouts];
   const totalMin = history.reduce((s, h) => s + (h.duration || 0), 0);
   const thisWeek = history.filter((h) => {
     const cutoff = new Date();
@@ -193,51 +195,88 @@ export default function History({ history, profile, allHistory = {}, profiles = 
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          {history.map((log, i) => (
-            <div key={i} className="bg-neutral-900 pixel-card p-4 group relative">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-white text-sm font-medium">{log.title}</p>
-                    <span style={{ color: "var(--accent)", fontSize: "10px", letterSpacing: "1px" }}>
-                      {"★".repeat(log.stars || 1)}
-                    </span>
-                  </div>
-                  <p className="text-neutral-600 text-xs mt-0.5">{formatDate(log.date)}</p>
+          {history.map((log, i) => {
+            const isOpen  = expandedIdx === i;
+            const workout = allWorkouts.find((w) => w.title === log.title);
+            const phases  = workout
+              ? [
+                  { label: "WARM-UP",  items: workout.warmup   || [] },
+                  { label: "MAIN",     items: workout.main      || [] },
+                  { label: "COOL-DOWN",items: workout.cooldown  || [] },
+                ].filter((p) => p.items.length > 0)
+              : [];
 
-                  <div className="flex flex-wrap gap-3 mt-2">
-                    {log.duration > 0 && (
-                      <span className="text-neutral-500 text-xs">{log.duration} min</span>
-                    )}
-                    {log.calories && (
-                      <span className="text-orange-400 text-xs">{log.calories} cal</span>
-                    )}
-                    {log.distance && (
-                      <span className="text-sky-400 text-xs">{log.distance} {log.distanceUnit}</span>
-                    )}
-                    {log.heartRate && (
-                      <span className="text-red-400 text-xs">♥ {log.heartRate} bpm</span>
+            return (
+              <div key={i} className="bg-neutral-900 pixel-card group relative">
+                {/* Header row — clickable */}
+                <button
+                  className="w-full text-left p-4"
+                  onClick={() => setExpandedIdx(isOpen ? null : i)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="text-white text-sm font-medium">{log.title}</p>
+                        <span style={{ color: "var(--accent)", fontSize: "10px", letterSpacing: "1px" }}>
+                          {"★".repeat(log.stars || 1)}
+                        </span>
+                      </div>
+                      <p className="text-neutral-600 text-xs mt-0.5">{formatDate(log.date)}</p>
+                      <div className="flex flex-wrap gap-3 mt-2">
+                        {log.duration > 0 && <span className="text-neutral-500 text-xs">{log.duration} min</span>}
+                        {log.calories  && <span className="text-orange-400 text-xs">{log.calories} cal</span>}
+                        {log.distance  && <span className="text-sky-400 text-xs">{log.distance} {log.distanceUnit}</span>}
+                        {log.heartRate && <span className="text-red-400 text-xs">♥ {log.heartRate} bpm</span>}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                      {log.category && (
+                        <span className={`font-display px-2 py-0.5 border ${catTag[log.category] || "text-neutral-400 border-neutral-700 bg-neutral-800"}`} style={{ fontSize: "6px" }}>
+                          {log.category}
+                        </span>
+                      )}
+                      <span className="text-neutral-600 text-xs">{isOpen ? "▲" : "▼"}</span>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Expanded exercise list */}
+                {isOpen && (
+                  <div className="px-4 pb-4 border-t border-neutral-800 pt-3">
+                    {phases.length > 0 ? phases.map(({ label, items }) => (
+                      <div key={label} className="mb-3 last:mb-0">
+                        <p className="font-display text-neutral-600 mb-1.5" style={{ fontSize: "6px", letterSpacing: "0.12em" }}>{label}</p>
+                        <div className="flex flex-col gap-1">
+                          {items.map((item, j) => {
+                            const ex   = item.exerciseId ? exerciseById[item.exerciseId] : null;
+                            const name = ex?.name || item.name || "—";
+                            const detail = item.duration || (item.sets && item.reps ? `${item.sets}×${item.reps}` : item.repsOrDuration) || "";
+                            return (
+                              <div key={j} className="flex items-center justify-between text-xs">
+                                <span className="text-neutral-300">{name}</span>
+                                <span className="text-neutral-600 ml-4 flex-shrink-0">{detail}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )) : (
+                      <p className="text-neutral-600 text-xs">No exercise details saved for this session.</p>
                     )}
                   </div>
-                </div>
+                )}
 
-                <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-                  {log.category && (
-                    <span className={`font-display px-2 py-0.5 border ${catTag[log.category] || "text-neutral-400 border-neutral-700 bg-neutral-800"}`} style={{ fontSize: "6px" }}>
-                      {log.category}
-                    </span>
-                  )}
-                  <button
-                    onClick={() => onDeleteEntry(i)}
-                    className="opacity-0 group-hover:opacity-100 text-neutral-700 hover:text-red-500 transition-all text-sm px-1"
-                    title="Delete entry"
-                  >
-                    ✕
-                  </button>
-                </div>
+                {/* Delete button */}
+                <button
+                  onClick={() => onDeleteEntry(i)}
+                  className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 text-neutral-700 hover:text-red-500 transition-all text-sm px-1"
+                  title="Delete entry"
+                >
+                  ✕
+                </button>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

@@ -81,18 +81,19 @@ export default function App() {
     const fetchLeaderboard = async () => {
       const { data } = await supabase
         .from("workout_history")
-        .select("profile_name, stars, date")
-        .eq("squad_id", profile.squadId);
+        .select("profile_name, stars, date, title, duration")
+        .eq("squad_id", profile.squadId)
+        .order("date", { ascending: false });
       if (cancelled || !data) return;
       const agg = {};
       const hist = {};
-      data.forEach(({ profile_name, stars, date }) => {
+      data.forEach(({ profile_name, stars, date, title, duration }) => {
         const key = profile_name.toLowerCase();
         if (!agg[key]) agg[key] = { name: profile_name, stars: 0, sessions: 0 };
         agg[key].stars += stars || 1;
         agg[key].sessions++;
         if (!hist[profile_name]) hist[profile_name] = [];
-        hist[profile_name].push({ date, stars: stars || 1 });
+        hist[profile_name].push({ date, stars: stars || 1, title, duration });
       });
       setSquadLeaderboard(Object.values(agg).sort((a, b) => b.stars - a.stars));
       setSquadHistory(hist);
@@ -386,6 +387,7 @@ export default function App() {
               onSwitch={setActiveId} onAddProfile={() => setAddingProfile(true)}
               onDeleteProfile={deleteProfile}
               squadLeaderboard={squadLeaderboard}
+              squadHistory={squadHistory}
               supabaseEnabled={!!supabase}
               onCreateSquad={createSquad}
               onJoinSquad={joinSquad}
@@ -409,7 +411,7 @@ export default function App() {
           <Route path="/session/:id" element={
             <ActiveSession customWorkouts={customWorkouts} customExercises={customExercises} profile={profile} onComplete={addToHistory} onToggleDislike={toggleDislikedExercise} />
           } />
-          <Route path="/history" element={<History history={history} profile={profile} allHistory={allHistory} profiles={profiles} onDeleteEntry={deleteHistoryEntry} onToggleDislike={toggleDislikedExercise} squadHistory={squadHistory} />} />
+          <Route path="/history" element={<History history={history} profile={profile} allHistory={allHistory} profiles={profiles} onDeleteEntry={deleteHistoryEntry} onToggleDislike={toggleDislikedExercise} squadHistory={squadHistory} customWorkouts={customWorkouts} />} />
           <Route path="/create" element={
             <CreateWorkout
               onSaveWorkout={saveCustomWorkout}
