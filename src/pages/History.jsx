@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CATEGORIES, workouts as presetWorkouts } from "../data/workouts";
 import { exerciseById } from "../data/exercises";
 
@@ -20,6 +20,7 @@ function formatDate(iso) {
 
 function Calendar({ allHistory, profiles, squadHistory = {} }) {
   const now = new Date();
+  const navigate = useNavigate();
   const [year, setYear]   = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
 
@@ -95,12 +96,15 @@ function Calendar({ allHistory, profiles, squadHistory = {} }) {
           const isToday    = key === todayKey;
           const solo       = profileEntries.length === 1 ? profileEntries[0] : null;
 
+          const isFuture = key > todayKey;
           return (
-            <div
+            <button
               key={i}
-              className={`h-10 flex flex-col items-center justify-start pt-1 ${
+              disabled={isFuture}
+              onClick={() => navigate("/log", { state: { date: new Date(year, month, day, 12, 0, 0).toISOString() } })}
+              className={`h-10 flex flex-col items-center justify-start pt-1 w-full transition-colors ${
                 isToday ? "border border-neutral-600" : ""
-              }`}
+              } ${isFuture ? "cursor-default" : "hover:bg-neutral-800 rounded"}`}
             >
               <span
                 className="font-display leading-none"
@@ -127,7 +131,7 @@ function Calendar({ allHistory, profiles, squadHistory = {} }) {
                   {"★".repeat(solo.stars === 3 ? 3 : 1)}
                 </span>
               )}
-            </div>
+            </button>
           );
         })}
       </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { workouts, CATEGORIES } from "../data/workouts";
 import { MUSCLES } from "../data/exercises";
 
@@ -142,6 +142,8 @@ function parseNL(text, allWorkouts) {
 
 export default function QuickLog({ customWorkouts = [], onComplete, onSaveWorkout }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const presetDate = location.state?.date || null;
   const [step, setStep] = useState("pick");
   const [selected, setSelected] = useState(null);
   const [customName, setCustomName] = useState("");
@@ -155,7 +157,7 @@ export default function QuickLog({ customWorkouts = [], onComplete, onSaveWorkou
   const [distance,  setDistance]  = useState("");
   const [unit,      setUnit]      = useState("km");
   const [heartRate, setHeartRate] = useState("");
-  const [logDate,   setLogDate]   = useState(null);
+  const [logDate,   setLogDate]   = useState(presetDate);
   const [bodyPart,  setBodyPart]  = useState(null);
 
   const allWorkouts = [...customWorkouts, ...workouts];
@@ -253,6 +255,11 @@ export default function QuickLog({ customWorkouts = [], onComplete, onSaveWorkou
             LOG SESSION
           </h1>
           <p className="text-neutral-500 text-sm">{selected?.title}</p>
+          {logDate && (
+            <p className="text-neutral-600 text-xs mt-0.5">
+              {new Date(logDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+            </p>
+          )}
         </div>
 
         {/* Body part chips — only for unmatched/custom workouts */}
