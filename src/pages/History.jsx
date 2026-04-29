@@ -211,38 +211,50 @@ export default function History({ history, profile, allHistory = {}, profiles = 
               : [];
 
             return (
-              <div key={i} className="bg-neutral-900 pixel-card group relative">
-                {/* Header row — clickable */}
-                <button
-                  className="w-full text-left p-4"
-                  onClick={() => setExpandedIdx(isOpen ? null : i)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="text-white text-sm font-medium">{log.title}</p>
-                        <span style={{ color: "var(--accent)", fontSize: "10px", letterSpacing: "1px" }}>
-                          {"★".repeat(log.stars || 1)}
-                        </span>
-                      </div>
-                      <p className="text-neutral-600 text-xs mt-0.5">{formatDate(log.date)}</p>
-                      <div className="flex flex-wrap gap-3 mt-2">
-                        {log.duration > 0 && <span className="text-neutral-500 text-xs">{log.duration} min</span>}
-                        {log.calories  && <span className="text-orange-400 text-xs">{log.calories} cal</span>}
-                        {log.distance  && <span className="text-sky-400 text-xs">{log.distance} {log.distanceUnit}</span>}
-                        {log.heartRate && <span className="text-red-400 text-xs">♥ {log.heartRate} bpm</span>}
-                      </div>
+              <div key={i} className="bg-neutral-900 pixel-card group">
+                {/* Header row */}
+                <div className="flex items-start p-4 gap-3">
+                  {/* Clickable main area */}
+                  <button
+                    className="flex-1 text-left min-w-0"
+                    onClick={() => setExpandedIdx(isOpen ? null : i)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <p className="text-white text-sm font-medium">{log.title}</p>
+                      <span style={{ color: "var(--accent)", fontSize: "10px", letterSpacing: "1px" }}>
+                        {"★".repeat(log.stars || 1)}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-                      {log.category && (
-                        <span className={`font-display px-2 py-0.5 border ${catTag[log.category] || "text-neutral-400 border-neutral-700 bg-neutral-800"}`} style={{ fontSize: "6px" }}>
-                          {log.category}
-                        </span>
-                      )}
-                      <span className="text-neutral-600 text-xs">{isOpen ? "▲" : "▼"}</span>
+                    <p className="text-neutral-600 text-xs mt-0.5">{formatDate(log.date)}</p>
+                    <div className="flex flex-wrap gap-3 mt-2">
+                      {log.duration > 0 && <span className="text-neutral-500 text-xs">{log.duration} min</span>}
+                      {log.calories  && <span className="text-orange-400 text-xs">{log.calories} cal</span>}
+                      {log.distance  && <span className="text-sky-400 text-xs">{log.distance} {log.distanceUnit}</span>}
+                      {log.heartRate && <span className="text-red-400 text-xs">♥ {log.heartRate} bpm</span>}
                     </div>
+                  </button>
+                  {/* Right controls — always in a row, no overlap */}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {log.category && (
+                      <span className={`font-display px-2 py-0.5 border ${catTag[log.category] || "text-neutral-400 border-neutral-700 bg-neutral-800"}`} style={{ fontSize: "6px" }}>
+                        {log.category}
+                      </span>
+                    )}
+                    <button
+                      onClick={() => setExpandedIdx(isOpen ? null : i)}
+                      className="text-neutral-600 hover:text-neutral-400 text-xs px-1 transition-colors"
+                    >
+                      {isOpen ? "▲" : "▼"}
+                    </button>
+                    <button
+                      onClick={() => onDeleteEntry(i)}
+                      className="opacity-0 group-hover:opacity-100 text-neutral-700 hover:text-red-500 transition-all text-sm px-1"
+                      title="Delete entry"
+                    >
+                      ✕
+                    </button>
                   </div>
-                </button>
+                </div>
 
                 {/* Expanded exercise list */}
                 {isOpen && (
@@ -270,14 +282,6 @@ export default function History({ history, profile, allHistory = {}, profiles = 
                   </div>
                 )}
 
-                {/* Delete button */}
-                <button
-                  onClick={() => onDeleteEntry(i)}
-                  className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 text-neutral-700 hover:text-red-500 transition-all text-sm px-1"
-                  title="Delete entry"
-                >
-                  ✕
-                </button>
               </div>
             );
           })}
