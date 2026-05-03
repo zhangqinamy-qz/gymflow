@@ -85,6 +85,53 @@ export const workouts = [
       { exerciseId: "hip-flexor-stretch", duration: "45 sec each side" },
     ],
   },
+  // ── ELLIPTICAL ────────────────────────────────────────────────────────────
+  {
+    id: "elliptical-steady",
+    title: "Elliptical Steady State",
+    category: CATEGORIES.RUNNING,
+    subcategory: "Elliptical",
+    difficulty: "Beginner",
+    duration: 35,
+    equipment: ["Elliptical Machine"],
+    description: "Low-impact cardio at a comfortable, sustained pace. Great alternative to running for joint-friendly cardio.",
+    warmup: [
+      { exerciseId: "leg-swing", duration: "30 sec each leg" },
+      { exerciseId: "hip-circle", duration: "30 sec each direction" },
+    ],
+    main: [
+      { exerciseId: "elliptical-steady", name: "Elliptical (Steady State)", duration: "25 min", note: "Maintain a pace where you can hold a conversation. Adjust resistance as needed." },
+    ],
+    cooldown: [
+      { exerciseId: "quad-stretch", duration: "45 sec each leg" },
+      { exerciseId: "hamstring-stretch", duration: "45 sec each leg" },
+      { exerciseId: "calf-stretch", duration: "45 sec each leg" },
+    ],
+  },
+  {
+    id: "elliptical-intervals",
+    title: "Elliptical Intervals",
+    category: CATEGORIES.RUNNING,
+    subcategory: "Elliptical",
+    difficulty: "Intermediate",
+    duration: 40,
+    equipment: ["Elliptical Machine"],
+    description: "Push-pull intervals on the elliptical to spike your heart rate and burn more calories than steady state.",
+    warmup: [
+      { exerciseId: "leg-swing", duration: "30 sec each leg" },
+      { exerciseId: "high-knees", duration: "30 sec" },
+    ],
+    main: [
+      { exerciseId: null, name: "Warm-up glide", duration: "5 min", note: "Easy resistance, moderate pace" },
+      { exerciseId: "elliptical-intervals", name: "Intervals", duration: "6 × (2 min hard / 1 min easy)", note: "Hard = high resistance or fast cadence, easy = recover" },
+      { exerciseId: null, name: "Cool-down glide", duration: "5 min", note: "Easy pace, drop resistance" },
+    ],
+    cooldown: [
+      { exerciseId: "quad-stretch", duration: "45 sec each leg" },
+      { exerciseId: "hamstring-stretch", duration: "45 sec each leg" },
+      { exerciseId: "calf-stretch", duration: "45 sec each leg" },
+    ],
+  },
   // ── BALL SPORTS ───────────────────────────────────────────────────────────
   {
     id: "volleyball-prep",

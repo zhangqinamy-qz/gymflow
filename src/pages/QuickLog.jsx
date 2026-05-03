@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { workouts, CATEGORIES } from "../data/workouts";
-import { MUSCLES } from "../data/exercises";
+import { MUSCLES, exerciseById } from "../data/exercises";
+import { getSessionCategories, inferCategories } from "../lib/diversityUtils";
 
 const SPORT_MUSCLES = new Set(["Volleyball", "Pickleball", "Tennis"]);
 const BODY_PART_TAGS = [
@@ -224,9 +225,14 @@ export default function QuickLog({ customWorkouts = [], onComplete, onSaveWorkou
   const save = () => {
     const dur = parseInt(duration) || 0;
     if (!dur) return;
+    const matchedWorkout = workouts.find((w) => w.title === selected?.title);
+    const categories = matchedWorkout
+      ? getSessionCategories(matchedWorkout, exerciseById)
+      : inferCategories(selected?.category, bodyPart);
     const log = {
       title:        selected?.title || "Workout",
       category:     selected?.category || bodyPart || null,
+      categories,
       date:         logDate || new Date().toISOString(),
       duration:     dur,
       calories:     calories  ? parseInt(calories)   : null,

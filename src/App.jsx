@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { supabase } from "./lib/supabase";
+import { computeWeeklyScore, getSessionCategories } from "./lib/diversityUtils";
+import { workouts as presetWorkouts } from "./data/workouts";
+import { exercises } from "./data/exercises";
 import Onboarding from "./pages/Onboarding";
 import Home from "./pages/Home";
 import Browse from "./pages/Browse";
@@ -13,7 +16,29 @@ import QuickLog from "./pages/QuickLog";
 import SquadMemberHistory from "./pages/SquadMemberHistory";
 import Nav from "./components/Nav";
 
+const exercisesById = Object.fromEntries(exercises.map((e) => [e.id, e]));
+
+function buildCategoryMap(allWorkouts) {
+  const map = {};
+  for (const w of allWorkouts) {
+    const cats = getSessionCategories(w, exercisesById);
+    if (cats.length > 0) map[w.title.toLowerCase()] = cats;
+  }
+  return map;
+}
+
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+const requestNotificationPermission = () => {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+};
+
+const fireNotification = (body) => {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  new Notification('GYMBUDDY', { body });
+};
 
 const rowToEntry = (row) => ({
   id:           row.id,
@@ -25,6 +50,7 @@ const rowToEntry = (row) => ({
   distance:     row.distance,
   distanceUnit: row.distance_unit,
   heartRate:    row.heart_rate,
+  categories:   row.categories ? row.categories.split(',').filter(Boolean) : [],
 });
 
 export default function App() {
@@ -40,6 +66,26 @@ export default function App() {
   }, [theme]);
 
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+
+  // Backfill categories for local sessions that were logged before diversity scoring was added
+  useEffect(() => {
+    const catMap = buildCategoryMap([...presetWorkouts, ...customWorkouts]);
+    setAllHistory((prev) => {
+      let changed = false;
+      const next = {};
+      for (const [pid, sessions] of Object.entries(prev)) {
+        next[pid] = sessions.map((s) => {
+          if (s.categories && s.categories.length > 0) return s;
+          const cats = catMap[s.title?.toLowerCase()] || [];
+          if (cats.length === 0) return s;
+          changed = true;
+          return { ...s, categories: cats };
+        });
+      }
+      return changed ? next : prev;
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customWorkouts.length]);
 
   const [addingProfile, setAddingProfile] = useState(false);
 
@@ -71,33 +117,80 @@ export default function App() {
   };
 
   // ─── Squad leaderboard ────────────────────────────────────────────────────
-  const [squadLeaderboard, setSquadLeaderboard] = useState([]);
-  const [squadHistory,     setSquadHistory]     = useState({});
-  const fetchLeaderboardRef = useRef(null);
+  const [squadLeaderboard,  setSquadLeaderboard]  = useState([]);
+  const [squadHistory,      setSquadHistory]      = useState({});
+  const [squadChallenges,   setSquadChallenges]   = useState([]);
+  const fetchLeaderboardRef   = useRef(null);
+  const fetchChallengesRef    = useRef(null);
+  const squadLeaderboardRef   = useRef([]);
+  const seenChallengeIds      = useRef(null); // null = not seeded yet
+  const seenCompletedIds      = useRef(null);
+  useEffect(() => { squadLeaderboardRef.current = squadLeaderboard; }, [squadLeaderboard]);
 
   useEffect(() => {
-    if (!supabase || !profile?.squadId) { setSquadLeaderboard([]); return; }
+    if (!supabase || !profile?.squadId) { setSquadLeaderboard([]); setSquadChallenges([]); seenChallengeIds.current = null; seenCompletedIds.current = null; return; }
+    requestNotificationPermission();
     let cancelled = false;
 
     const fetchLeaderboard = async () => {
       const { data } = await supabase
         .from("workout_history")
-        .select("profile_name, stars, date, title, duration, calories, distance, distance_unit, heart_rate")
+        .select("profile_name, stars, date, title, duration, calories, distance, distance_unit, heart_rate, categories")
         .eq("squad_id", profile.squadId)
         .order("date", { ascending: false });
       if (cancelled || !data) return;
       const agg = {};
       const hist = {};
-      data.forEach(({ profile_name, stars, date, title, duration, calories, distance, distance_unit, heart_rate }) => {
+      data.forEach(({ profile_name, stars, date, title, duration, calories, distance, distance_unit, heart_rate, categories }) => {
         const key = profile_name.toLowerCase();
-        if (!agg[key]) agg[key] = { name: profile_name, stars: 0, sessions: 0 };
-        agg[key].stars += stars || 1;
+        if (!agg[key]) agg[key] = { name: profile_name, sessions: 0 };
         agg[key].sessions++;
         if (!hist[profile_name]) hist[profile_name] = [];
-        hist[profile_name].push({ date, stars: stars || 1, title, duration, calories, distance, distanceUnit: distance_unit, heartRate: heart_rate });
+        hist[profile_name].push({
+          date, stars: stars || 1, title, duration,
+          calories, distance, distanceUnit: distance_unit, heartRate: heart_rate,
+          categories: categories ? categories.split(',').filter(Boolean) : [],
+        });
       });
-      setSquadLeaderboard(Object.values(agg).sort((a, b) => b.stars - a.stars));
+      Object.entries(agg).forEach(([key, entry]) => {
+        const histKey = Object.keys(hist).find((k) => k.toLowerCase() === key);
+        const { score, weekStars, hitCategories } = computeWeeklyScore(histKey ? hist[histKey] : []);
+        entry.weeklyScore = score;
+        entry.weekStars = weekStars;
+        entry.hitCategories = hitCategories;
+      });
+      const newBoard = Object.values(agg).sort((a, b) => b.weeklyScore - a.weeklyScore);
+
+      if (squadLeaderboardRef.current.length > 0) {
+        const myName = profile.name.toLowerCase();
+        const oldRank = squadLeaderboardRef.current.findIndex((m) => m.name.toLowerCase() === myName);
+        const newRank = newBoard.findIndex((m) => m.name.toLowerCase() === myName);
+        if (oldRank !== -1 && newRank !== -1 && newRank > oldRank) {
+          const passer = newBoard[newRank - 1];
+          fireNotification(`${passer?.name || "Someone"} just passed you on the leaderboard! 💪`);
+        }
+      }
+
+      setSquadLeaderboard(newBoard);
       setSquadHistory(hist);
+    };
+
+    // Backfill categories on remote rows that predate diversity scoring
+    const backfillCategories = async () => {
+      const catMap = buildCategoryMap([...presetWorkouts, ...customWorkouts]);
+      const { data } = await supabase
+        .from("workout_history")
+        .select("id, title")
+        .eq("squad_id", profile.squadId)
+        .is("categories", null);
+      if (!data || data.length === 0) return;
+      const toUpdate = data.filter((row) => catMap[row.title?.toLowerCase()]);
+      for (const row of toUpdate) {
+        await supabase
+          .from("workout_history")
+          .update({ categories: catMap[row.title.toLowerCase()].join(',') })
+          .eq("id", row.id);
+      }
     };
 
     // Backfill any local sessions that weren't synced when this profile joined the squad.
@@ -116,13 +209,49 @@ export default function App() {
         distance:      e.distance      || null,
         distance_unit: e.distanceUnit  || null,
         heart_rate:    e.heartRate     || null,
+        categories:    e.categories?.join(',') || null,
       }));
       await supabase.from("workout_history").upsert(rows, { onConflict: "id" });
     };
 
-    fetchLeaderboardRef.current = fetchLeaderboard;
+    const fetchChallenges = async () => {
+      const { data } = await supabase
+        .from("squad_challenges")
+        .select("*")
+        .eq("squad_id", profile.squadId)
+        .order("created_at", { ascending: false });
+      if (cancelled || !data) return;
 
-    const init = async () => { await backfill(); await fetchLeaderboard(); };
+      const myName = profile.name.toLowerCase();
+      const pending   = data.filter((c) => c.to_name?.toLowerCase()   === myName && !c.completed);
+      const completed = data.filter((c) => c.from_name?.toLowerCase() === myName &&  c.completed);
+
+      if (seenChallengeIds.current === null) {
+        // First load — seed without notifying
+        seenChallengeIds.current  = new Set(pending.map((c) => c.id));
+        seenCompletedIds.current  = new Set(completed.map((c) => c.id));
+      } else {
+        pending.forEach((c) => {
+          if (!seenChallengeIds.current.has(c.id)) {
+            fireNotification(`${c.from_name} challenged you: ${c.workout_title} ⚡`);
+            seenChallengeIds.current.add(c.id);
+          }
+        });
+        completed.forEach((c) => {
+          if (!seenCompletedIds.current.has(c.id)) {
+            fireNotification(`${c.to_name} completed your challenge: ${c.workout_title}! 🎉`);
+            seenCompletedIds.current.add(c.id);
+          }
+        });
+      }
+
+      setSquadChallenges(data);
+    };
+
+    fetchLeaderboardRef.current  = fetchLeaderboard;
+    fetchChallengesRef.current   = fetchChallenges;
+
+    const init = async () => { await backfill(); await backfillCategories(); await fetchLeaderboard(); await fetchChallenges(); };
     init();
 
     // Re-fetch when user returns to the tab (mobile backgrounding drops real-time)
@@ -133,9 +262,17 @@ export default function App() {
       .channel(`squad:${profile.squadId}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "workout_history", filter: `squad_id=eq.${profile.squadId}` }, fetchLeaderboard)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "squad_members",   filter: `squad_id=eq.${profile.squadId}` }, fetchLeaderboard)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "squad_challenges", filter: `squad_id=eq.${profile.squadId}` }, () => fetchChallengesRef.current?.())
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "squad_challenges", filter: `squad_id=eq.${profile.squadId}` }, () => fetchChallengesRef.current?.())
       .subscribe();
 
-    return () => { cancelled = true; document.removeEventListener("visibilitychange", onVisible); supabase.removeChannel(channel); };
+    const pollInterval = setInterval(() => {
+      if (document.hidden) return;
+      fetchLeaderboardRef.current?.();
+      fetchChallengesRef.current?.();
+    }, 600000);
+
+    return () => { cancelled = true; clearInterval(pollInterval); document.removeEventListener("visibilitychange", onVisible); supabase.removeChannel(channel); };
   }, [profile?.squadId]);
 
   // ─── History sync ─────────────────────────────────────────────────────────
@@ -256,12 +393,48 @@ export default function App() {
     setProfiles((prev) => prev.map((p) => p.id === activeId ? { ...p, squadId: null } : p));
     setSquadLeaderboard([]);
     setSquadHistory({});
+    setSquadChallenges([]);
+  };
+
+  const sendChallenge = async (toName, workoutTitle, workoutId, message) => {
+    if (!supabase || !profile?.squadId) return;
+    await supabase.from("squad_challenges").insert({
+      id:            uid(),
+      squad_id:      profile.squadId,
+      from_name:     profile.name,
+      to_name:       toName,
+      workout_title: workoutTitle,
+      workout_id:    workoutId || null,
+      message:       message   || null,
+    });
+  };
+
+  const completeChallenge = async (challengeId) => {
+    if (!supabase) return;
+    const now = new Date().toISOString();
+    await supabase.from("squad_challenges")
+      .update({ completed: true, completed_at: now })
+      .eq("id", challengeId);
+    setSquadChallenges((prev) =>
+      prev.map((c) => c.id === challengeId ? { ...c, completed: true, completed_at: now } : c)
+    );
   };
 
   // ─── Log workout ──────────────────────────────────────────────────────────
   const addToHistory = (log) => {
     const stars = (log.duration || 0) >= 60 ? 3 : (log.duration || 0) >= 45 ? 2 : 1;
-    const entry = { ...log, stars, id: log.id || uid() };
+    const entry = { ...log, stars, id: log.id || uid(), categories: log.categories || [] };
+
+    // Auto-complete any pending challenge that matches this workout title
+    if (profile?.squadId) {
+      squadChallenges
+        .filter((c) =>
+          c.to_name.toLowerCase() === profile.name.toLowerCase() &&
+          !c.completed &&
+          c.workout_title.toLowerCase() === (log.title || "").toLowerCase()
+        )
+        .forEach((c) => completeChallenge(c.id));
+    }
     setAllHistory((h) => ({ ...h, [activeId]: [entry, ...(h[activeId] || [])] }));
     if (supabase && profile?.squadId) {
       supabase.from("squad_sessions").insert({
@@ -285,18 +458,26 @@ export default function App() {
         distance:     entry.distance     || null,
         distance_unit: entry.distanceUnit || null,
         heart_rate:   entry.heartRate    || null,
+        categories:   entry.categories?.join(',') || null,
       }, { onConflict: "id" }).then(() => fetchLeaderboardRef.current?.());
     }
   };
 
   // ─── Leaderboard (local profiles) ────────────────────────────────────────
   const leaderboard = profiles
-    .map((p) => ({
-      ...p,
-      sessions: (allHistory[p.id] || []).length,
-      stars: (allHistory[p.id] || []).reduce((sum, l) => sum + (l.stars || 1), 0),
-    }))
-    .sort((a, b) => b.stars - a.stars);
+    .map((p) => {
+      const sessions = allHistory[p.id] || [];
+      const { score, weekStars, hitCategories } = computeWeeklyScore(sessions);
+      return {
+        ...p,
+        sessions: sessions.length,
+        stars: sessions.reduce((sum, l) => sum + (l.stars || 1), 0),
+        weeklyScore: score,
+        weekStars,
+        hitCategories,
+      };
+    })
+    .sort((a, b) => b.weeklyScore - a.weeklyScore);
 
   const toggleDislikedExercise = (exerciseId) => {
     setProfiles((prev) =>
@@ -311,6 +492,10 @@ export default function App() {
         };
       })
     );
+  };
+
+  const updateProfile = (id, updates) => {
+    setProfiles((prev) => prev.map((p) => p.id === id ? { ...p, ...updates } : p));
   };
 
   const deleteProfile = (id) => {
@@ -386,9 +571,13 @@ export default function App() {
               profile={profile} profiles={profiles} activeId={activeId}
               history={history} leaderboard={leaderboard}
               onSwitch={setActiveId} onAddProfile={() => setAddingProfile(true)}
-              onDeleteProfile={deleteProfile}
+              onDeleteProfile={deleteProfile} onUpdateProfile={updateProfile}
               squadLeaderboard={squadLeaderboard}
               squadHistory={squadHistory}
+              squadChallenges={squadChallenges}
+              onSendChallenge={sendChallenge}
+              onCompleteChallenge={completeChallenge}
+              customWorkouts={customWorkouts}
               supabaseEnabled={!!supabase}
               onCreateSquad={createSquad}
               onJoinSquad={joinSquad}

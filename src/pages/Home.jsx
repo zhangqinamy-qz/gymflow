@@ -2,14 +2,27 @@
 import { Link, useNavigate } from "react-router-dom";
 import { workouts, CATEGORIES } from "../data/workouts";
 import ProfileSwitcher from "../components/ProfileSwitcher";
+import ChallengeModal from "../components/ChallengeModal";
+import { DIVERSITY_ORDER, DIVERSITY_LABELS } from "../lib/diversityUtils";
 
-function SquadSection({ profile, activeId, squadLeaderboard, squadHistory = {}, onCreateSquad, onJoinSquad, onLeaveSquad }) {
+function SquadSection({ profile, activeId, squadLeaderboard, squadHistory = {}, squadChallenges = [], onCreateSquad, onJoinSquad, onLeaveSquad, onSendChallenge, customWorkouts = [] }) {
   const navigate = useNavigate();
-  const [joinCode, setJoinCode]   = useState("");
-  const [joining,  setJoining]    = useState(false);
-  const [creating, setCreating]   = useState(false);
-  const [error,    setError]      = useState("");
-  const [copied,   setCopied]     = useState(false);
+  const [joinCode,        setJoinCode]        = useState("");
+  const [joining,         setJoining]         = useState(false);
+  const [creating,        setCreating]        = useState(false);
+  const [error,           setError]           = useState("");
+  const [copied,          setCopied]          = useState(false);
+  const [challengingName, setChallengingName] = useState(null);
+
+  const badgeCounts = {};
+  squadChallenges.filter((c) => c.completed).forEach((c) => {
+    const from = c.from_name.toLowerCase();
+    const to   = c.to_name.toLowerCase();
+    if (!badgeCounts[from]) badgeCounts[from] = { coached: 0, completed: 0 };
+    if (!badgeCounts[to])   badgeCounts[to]   = { coached: 0, completed: 0 };
+    badgeCounts[from].coached++;
+    badgeCounts[to].completed++;
+  });
 
   const inSquad = !!profile?.squadId;
 
@@ -112,30 +125,71 @@ function SquadSection({ profile, activeId, squadLeaderboard, squadHistory = {}, 
           {squadLeaderboard.map((m, i) => {
             const isMe      = m.name.toLowerCase() === profile?.name?.toLowerCase();
             const rankColor = RANK_COLORS[i] || "#555";
+            const badges    = badgeCounts[m.name.toLowerCase()];
             return (
-              <button
+              <div
                 key={m.name}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left border-b border-neutral-800 last:border-b-0 hover:bg-neutral-800/40 transition-colors ${isMe ? "bg-neutral-800/60" : ""}`}
-                onClick={() => navigate(`/squad/${encodeURIComponent(m.name)}`)}
+                className={`flex items-center gap-2 px-4 py-3 border-b border-neutral-800 last:border-b-0 ${isMe ? "bg-neutral-800/60" : ""}`}
               >
-                <span className="font-display w-6 flex-shrink-0" style={{ fontSize: "8px", color: rankColor }}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center border" style={{ borderColor: rankColor, background: `${rankColor}18` }}>
-                  <span className="font-display" style={{ fontSize: "7px", color: rankColor }}>{m.name[0]?.toUpperCase()}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium truncate">
-                    {m.name}{isMe && <span className="text-neutral-600 text-xs ml-1">(you)</span>}
-                  </p>
-                  <p className="text-neutral-600 text-xs">{m.sessions} session{m.sessions !== 1 ? "s" : ""}</p>
-                </div>
+                <button
+                  className="flex items-center gap-3 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity"
+                  onClick={() => navigate(`/squad/${encodeURIComponent(m.name)}`)}
+                >
+                  <span className="font-display w-6 flex-shrink-0" style={{ fontSize: "8px", color: rankColor }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center border" style={{ borderColor: rankColor, background: `${rankColor}18` }}>
+                    <span className="font-display" style={{ fontSize: "7px", color: rankColor }}>{m.name[0]?.toUpperCase()}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <p className="text-white text-sm font-medium truncate">
+                        {m.name}{isMe && <span className="text-neutral-600 text-xs ml-1">(you)</span>}
+                      </p>
+                      {badges?.coached > 0 && (
+                        <span className="font-display" style={{ fontSize: "6px", color: "#f59e0b" }} title="Challenges helped">🏋️ {badges.coached}</span>
+                      )}
+                      {badges?.completed > 0 && (
+                        <span className="font-display" style={{ fontSize: "6px", color: "var(--accent)" }} title="Challenges completed">⚡ {badges.completed}</span>
+                      )}
+                    </div>
+                    <p className="text-neutral-600 text-xs">{m.sessions} session{m.sessions !== 1 ? "s" : ""}</p>
+                    <div className="flex gap-1 mt-1.5">
+                      {DIVERSITY_ORDER.map((cat) => {
+                        const lit = m.hitCategories?.includes(cat);
+                        return (
+                          <span
+                            key={cat}
+                            className="font-display"
+                            style={{
+                              fontSize: "5px",
+                              letterSpacing: "0.04em",
+                              padding: "1px 3px",
+                              color: lit ? "var(--accent)" : "#444",
+                              border: `1px solid ${lit ? "var(--accent)" : "#333"}`,
+                            }}
+                          >
+                            {DIVERSITY_LABELS[cat]}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </button>
                 <div className="flex-shrink-0 text-right">
-                  <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>{m.stars}</p>
-                  <p className="text-neutral-600" style={{ fontSize: "9px" }}>★ stars</p>
+                  <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>{m.weeklyScore || 0}</p>
+                  <p className="text-neutral-600" style={{ fontSize: "9px" }}>WK SCORE</p>
                 </div>
-                <span className="text-neutral-600 text-xs ml-2">›</span>
-              </button>
+                {!isMe && onSendChallenge && (
+                  <button
+                    onClick={() => setChallengingName(m.name)}
+                    className="flex-shrink-0 w-8 border border-neutral-800 text-neutral-600 hover:border-yellow-700 hover:text-yellow-500 transition-colors text-xs self-stretch flex items-center justify-center"
+                    title="Send challenge"
+                  >
+                    ⚡
+                  </button>
+                )}
+              </div>
             );
           })}
         </div>
@@ -143,6 +197,15 @@ function SquadSection({ profile, activeId, squadLeaderboard, squadHistory = {}, 
         <p className="text-neutral-600 text-sm text-center py-3">
           No sessions yet — log a workout to appear here!
         </p>
+      )}
+
+      {challengingName && (
+        <ChallengeModal
+          toName={challengingName}
+          customWorkouts={customWorkouts}
+          onSend={async (title, id, msg) => { await onSendChallenge(challengingName, title, id, msg); }}
+          onClose={() => setChallengingName(null)}
+        />
       )}
     </div>
   );
@@ -189,7 +252,7 @@ function WorkoutCard({ workout }) {
   );
 }
 
-export default function Home({ profile, profiles, activeId, history, leaderboard = [], onSwitch, onAddProfile, onDeleteProfile, squadLeaderboard = [], squadHistory = {}, supabaseEnabled = false, onCreateSquad, onJoinSquad, onLeaveSquad }) {
+export default function Home({ profile, profiles, activeId, history, leaderboard = [], onSwitch, onAddProfile, onDeleteProfile, onUpdateProfile, squadLeaderboard = [], squadHistory = {}, squadChallenges = [], onSendChallenge, onCompleteChallenge, customWorkouts = [], supabaseEnabled = false, onCreateSquad, onJoinSquad, onLeaveSquad }) {
   const [showSwitcher, setShowSwitcher] = useState(false);
 
   const today = new Date();
@@ -250,6 +313,7 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
           onSwitch={onSwitch}
           onAddProfile={onAddProfile}
           onDeleteProfile={onDeleteProfile}
+          onUpdateProfile={onUpdateProfile}
           onClose={() => setShowSwitcher(false)}
         />
       )}
@@ -318,12 +382,53 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
         <span className="font-display text-neutral-400" style={{ fontSize: "8px", letterSpacing: "0.12em" }}>✎ LOG PAST WORKOUT</span>
       </Link>
 
+      {/* Challenges inbox */}
+      {squadChallenges.filter((c) => c.to_name.toLowerCase() === profile?.name?.toLowerCase() && !c.completed).length > 0 && (
+        <div className="mb-8">
+          <h2 className="font-display text-white mb-3" style={{ fontSize: "9px", letterSpacing: "0.12em" }}>CHALLENGES ⚡</h2>
+          <div className="flex flex-col gap-2">
+            {squadChallenges
+              .filter((c) => c.to_name.toLowerCase() === profile?.name?.toLowerCase() && !c.completed)
+              .map((c) => (
+                <div key={c.id} className="bg-neutral-900 pixel-card p-4">
+                  <p className="font-display mb-1" style={{ fontSize: "6px", letterSpacing: "0.12em", color: "#f59e0b" }}>
+                    FROM {c.from_name.toUpperCase()}
+                  </p>
+                  <p className="text-white font-medium text-sm">{c.workout_title}</p>
+                  {c.message && <p className="text-neutral-500 text-xs mt-1">"{c.message}"</p>}
+                  <div className="flex gap-2 mt-3">
+                    {c.workout_id && (
+                      <Link
+                        to={`/workout/${c.workout_id}`}
+                        className="flex-1 py-2 text-center font-display text-neutral-950 pixel-btn"
+                        style={{ background: "var(--accent)", fontSize: "7px", letterSpacing: "0.1em" }}
+                      >
+                        START
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => onCompleteChallenge(c.id)}
+                      className="flex-1 py-2 font-display border border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-neutral-200 transition-colors"
+                      style={{ fontSize: "7px", letterSpacing: "0.1em" }}
+                    >
+                      MARK DONE ✓
+                    </button>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Squad */}
       <SquadSection
         profile={profile}
         activeId={activeId}
         squadLeaderboard={squadLeaderboard}
         squadHistory={squadHistory}
+        squadChallenges={squadChallenges}
+        onSendChallenge={onSendChallenge}
+        customWorkouts={customWorkouts}
         onCreateSquad={onCreateSquad}
         onJoinSquad={onJoinSquad}
         onLeaveSquad={onLeaveSquad}
@@ -359,19 +464,41 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
                     </span>
                   </div>
 
-                  {/* Name + sessions */}
+                  {/* Name + sessions + diversity badge */}
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm font-medium truncate">
                       {p.name}
                       {isActive && <span className="text-neutral-600 text-xs ml-1">(you)</span>}
                     </p>
                     <p className="text-neutral-600 text-xs">{p.sessions} session{p.sessions !== 1 ? "s" : ""}</p>
+                    <div className="flex gap-1 mt-1.5">
+                      {DIVERSITY_ORDER.map((cat) => {
+                        const lit = p.hitCategories?.includes(cat);
+                        return (
+                          <span
+                            key={cat}
+                            className="font-display"
+                            style={{
+                              fontSize: "5px",
+                              letterSpacing: "0.04em",
+                              padding: "1px 3px",
+                              color: lit ? "var(--accent)" : "#444",
+                              border: `1px solid ${lit ? "var(--accent)" : "#333"}`,
+                            }}
+                          >
+                            {DIVERSITY_LABELS[cat]}
+                          </span>
+                        );
+                      })}
+                    </div>
                   </div>
 
-                  {/* Stars */}
+                  {/* Weekly score */}
                   <div className="flex-shrink-0 text-right">
-                    <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>{p.stars}</p>
-                    <p className="text-neutral-600" style={{ fontSize: "9px" }}>★ stars</p>
+                    <p className="font-display" style={{ color: rankColor, fontSize: "14px" }}>
+                      {p.weeklyScore || 0}
+                    </p>
+                    <p className="text-neutral-600" style={{ fontSize: "9px" }}>WK SCORE</p>
                   </div>
                 </div>
               );

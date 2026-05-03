@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { workouts, CATEGORIES } from "../data/workouts";
 import { exerciseById } from "../data/exercises";
 import BodyMap from "../components/BodyMap";
+import { getSessionCategories } from "../lib/diversityUtils";
 
 function buildSteps(workout) {
   if (workout.isCustom) {
@@ -225,6 +226,7 @@ export default function ActiveSession({ customWorkouts = [], customExercises = [
           const log = {
             title: workout.title,
             category: workout.category,
+            categories: getSessionCategories(workout, allExercisesById),
             date: new Date().toISOString(),
             ...data,
           };
