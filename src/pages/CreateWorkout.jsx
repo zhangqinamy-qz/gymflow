@@ -108,7 +108,7 @@ function MusclePicker({ label, selected, onChange, exclude = [] }) {
   );
 }
 
-function CreateExercise({ onSave, customExercises }) {
+function CreateExercise({ onSave, onDelete, customExercises }) {
   const [name, setName]        = useState("");
   const [difficulty, setDiff]  = useState("Beginner");
   const [equipment, setEquip]  = useState([]);
@@ -199,9 +199,20 @@ function CreateExercise({ onSave, customExercises }) {
           <p className="font-display text-neutral-600 mb-3" style={{ fontSize: "7px", letterSpacing: "0.12em" }}>MY EXERCISES ({customExercises.length})</p>
           <div className="flex flex-col gap-2">
             {customExercises.map((ex) => (
-              <div key={ex.id} className="bg-neutral-900 pixel-card p-3 text-sm">
-                <p className="text-white font-medium">{ex.name}</p>
-                <p className="text-neutral-600 text-xs mt-0.5">{ex.difficulty} · {ex.primary.join(", ")}</p>
+              <div key={ex.id} className="bg-neutral-900 pixel-card p-3 text-sm flex items-center gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-medium truncate">{ex.name}</p>
+                  <p className="text-neutral-600 text-xs mt-0.5">{ex.difficulty} · {ex.primary.join(", ")}</p>
+                </div>
+                {onDelete && (
+                  <button
+                    onClick={() => onDelete(ex.id)}
+                    className="text-neutral-600 hover:text-red-400 px-2 text-sm"
+                    title="Delete exercise"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -266,7 +277,7 @@ function PhaseRow({ item, index, onRemove, allExById }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function CreateWorkout({ onSaveWorkout, onSaveExercise, customExercises = [] }) {
+export default function CreateWorkout({ onSaveWorkout, onSaveExercise, onDeleteExercise, customExercises = [] }) {
   const navigate = useNavigate();
   const [tab, setTab] = useState("workout");
 
@@ -489,7 +500,7 @@ export default function CreateWorkout({ onSaveWorkout, onSaveExercise, customExe
       )}
 
       {tab === "exercise" && (
-        <CreateExercise onSave={onSaveExercise} customExercises={customExercises} />
+        <CreateExercise onSave={onSaveExercise} onDelete={onDeleteExercise} customExercises={customExercises} />
       )}
     </div>
   );
