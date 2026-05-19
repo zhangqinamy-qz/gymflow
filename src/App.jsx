@@ -633,6 +633,7 @@ export default function App() {
               onCreateSquad={createSquad}
               onJoinSquad={joinSquad}
               onLeaveSquad={leaveSquad}
+              onSaveWorkout={saveCustomWorkout}
             />
           } />
           <Route path="/browse" element={

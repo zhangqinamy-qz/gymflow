@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { workouts, CATEGORIES } from "../data/workouts";
 import ProfileSwitcher from "../components/ProfileSwitcher";
 import ChallengeModal from "../components/ChallengeModal";
+import AICoach from "../components/AICoach";
 import { DIVERSITY_ORDER, DIVERSITY_LABELS } from "../lib/diversityUtils";
 
 function SquadSection({ profile, activeId, squadLeaderboard, squadHistory = {}, squadChallenges = [], onCreateSquad, onJoinSquad, onLeaveSquad, onSendChallenge, customWorkouts = [] }) {
@@ -252,7 +253,7 @@ function WorkoutCard({ workout }) {
   );
 }
 
-export default function Home({ profile, profiles, activeId, history, leaderboard = [], onSwitch, onAddProfile, onDeleteProfile, onUpdateProfile, squadLeaderboard = [], squadHistory = {}, squadChallenges = [], onSendChallenge, onCompleteChallenge, customWorkouts = [], supabaseEnabled = false, onCreateSquad, onJoinSquad, onLeaveSquad }) {
+export default function Home({ profile, profiles, activeId, history, leaderboard = [], onSwitch, onAddProfile, onDeleteProfile, onUpdateProfile, squadLeaderboard = [], squadHistory = {}, squadChallenges = [], onSendChallenge, onCompleteChallenge, customWorkouts = [], supabaseEnabled = false, onCreateSquad, onJoinSquad, onLeaveSquad, onSaveWorkout }) {
   const [showSwitcher, setShowSwitcher] = useState(false);
 
   const today = new Date();
@@ -381,6 +382,9 @@ export default function Home({ profile, profiles, activeId, history, leaderboard
       >
         <span className="font-display text-neutral-400" style={{ fontSize: "8px", letterSpacing: "0.12em" }}>✎ LOG PAST WORKOUT</span>
       </Link>
+
+      {/* AI Coach */}
+      <AICoach profile={profile} history={history} onSaveWorkout={onSaveWorkout} />
 
       {/* Challenges inbox */}
       {squadChallenges.filter((c) => c.to_name.toLowerCase() === profile?.name?.toLowerCase() && !c.completed).length > 0 && (
